@@ -2,24 +2,21 @@
 // Component Imports
 import DocumentHead from '../layouts/DocumentHead.astro';
 import Layout from '../layouts/Layout.astro';
-import HomeNotes from '../layouts/HomeNotes.astro';
+import AboutPage from '../layouts/AboutPage.astro';
 
-let title = `Home | Sanket Maske's digital garden`;
-let description = `Hi 👋🏼 I'm Sanket. A developer building software for CodePen, wife, mother of two,
+let title = `About | Rach Smith's digital garden`;
+let description = `Hi  I'm Rach. A developer building software for CodePen, wife, mother of two,
   productivity nerd and recovering screen addict. This is my digital garden.`;
-let permalink = 'https://sanketmaske.dev';
+let permalink = 'https://rachsmith.com';
 
 let page = 'notes';
 ---
-
-
-
 
 <html lang="en">
   <DocumentHead title={title} description={description} permalink={permalink} />
   <body>
     <Layout page={page}>
-      <HomeNotes />
+      <AboutPage />
     </Layout>
   </body>
 </html>
