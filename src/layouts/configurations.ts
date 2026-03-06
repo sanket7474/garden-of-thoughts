@@ -1,23 +1,24 @@
 const configurations = {
   darkMode: 'dark-mode',
-  rainbows: 'rainbows',
   cursorTrails: 'cursor-trails',
 };
 const checkboxValues = {
   [configurations.darkMode]: false,
-  [configurations.rainbows]: false,
   [configurations.cursorTrails]: false,
 };
 
 let trailsScriptsInjected = false;
 
 function disableOption(option) {
+  document.documentElement.classList.add('rainbows');
   document.documentElement.classList.remove(option);
   if (option === configurations.darkMode)
     document.documentElement.style.colorScheme = 'light';
   window.localStorage.setItem(option, 'false');
 }
 function enableOption(option) {
+
+  document.documentElement.classList.add('rainbows');
   document.documentElement.classList.add(option);
   if (option === configurations.darkMode)
     document.documentElement.style.colorScheme = 'dark';
@@ -60,10 +61,6 @@ for (const option of Object.values(configurations)) {
           disableOption(option);
         }
         break;
-      case configurations.rainbows:
-        enableOption(option);
-        checkboxValues[option] = true;
-        break;
       case configurations.cursorTrails:
         // respect reduced motion
         if (
@@ -82,11 +79,15 @@ for (const option of Object.values(configurations)) {
 
 addEventListener('DOMContentLoaded', (event) => {
 
-    console.log('Configurations loaded');
+  
   for (const option of Object.values(configurations)) {
+
+    console.log('Setting up option:', option);
+
     const checkbox = document.getElementById(option) as HTMLInputElement;
     if (checkbox) {
       checkbox.addEventListener('click', () => {
+        
         if (checkbox.checked) {
           enableOption(option);
         } else {
