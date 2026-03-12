@@ -9,7 +9,7 @@ interface Props {
   includeYTResources?: boolean | null;
 }
 
-let { title, description = '', permalink, canonicalUrl, includeYTResources } =
+let { title, description, permalink, canonicalUrl, includeYTResources } =
   Astro.props;
 ---
 
@@ -200,6 +200,28 @@ let { title, description = '', permalink, canonicalUrl, includeYTResources } =
       background: var(--background-color);
       color: var(--text-color);
     }
+    * {
+    cursor: url('/cursor.svg') 0 0, auto;
+  }
+  a, button, [role="button"], label, select, summary {
+    cursor: url('/pointer.svg') 0 0, pointer;
+  }
+
+    a, button, [role="button"], label, select, summary {
+     cursor: url('/pointer.svg') 0 0, pointer;
+    }
+
+     .dark-mode * {
+    cursor: url('/cursor-dark.svg') 0 0, auto;
+  }
+  .dark-mode a,
+  .dark-mode button,
+  .dark-mode [role="button"],
+  .dark-mode label,
+  .dark-mode select,
+  .dark-mode summary {
+    cursor: url('/pointer-dark.svg') 0 0, pointer;
+  }
 
     a {
       color: inherit;
