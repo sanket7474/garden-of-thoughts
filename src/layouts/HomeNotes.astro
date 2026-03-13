@@ -2,6 +2,230 @@
 <!-- import type { CollectionEntry } from 'astro:content';
 import { getNoteHref, makeNoteFromNugget, monthNames } from '../data/postConfig'; -->
 
+<style>
+/* iridescent eye-spot as logo mark */
+
+:root {
+  --bg:       #0a0a0a;
+  --bg-lift:  #111111;
+  --rule:     #1e1e1e;
+  --text:     #ddd8ce;
+  --sub:      #888070;
+  --ghost:    #333028;
+
+ 
+  /* layout */
+  --col: 560px;
+  --px:  28px;
+}
 
 
-<a href="../pages/blog/hello-world"> Note 1 </a>
+
+.post-list {
+  padding: 28px 0 60px;
+}
+
+
+.year-sep {
+  display: block;
+  font-size: 2.5rem;
+  font-style: italic;
+  font-weight: 400;
+  color: var(--text-color);
+  letter-spacing: -.03em;
+  padding: 44px 0 0;
+  line-height: 1;
+  opacity: .5;
+  user-select: none; 
+}
+
+
+.month-group { margin-top: 0; }
+
+.month-label {
+  display: block;
+  padding: 28px 0 10px;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.month-label span {
+  
+  font-size: 1.4rem;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.post-row {
+  display: grid;
+  grid-template-columns: 52px 1fr;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-color);
+  cursor: pointer;
+  position: relative;
+  text-decoration: none;
+  color: inherit;
+  cursor: url('/pointer.svg') 0 0, pointer;
+}
+
+.post-row::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  transform: scaleY(0);
+  transform-origin: center;
+  transition: transform .2s ease;
+}
+
+.month-group .post-row:nth-child(7n+1)::before { background: var(--red); }
+.month-group .post-row:nth-child(7n+2)::before { background: var(--orange); }
+.month-group .post-row:nth-child(7n+3)::before { background: var(--pink); }
+.month-group .post-row:nth-child(7n+4)::before { background: var(--green); }
+.month-group .post-row:nth-child(7n+5)::before { background: var(--light-blue); }
+.month-group .post-row:nth-child(7n+6)::before { background: var(--purple); }
+.month-group .post-row:nth-child(7n+0)::before { background: var(--blue); }
+
+.post-row:hover::before { transform: scaleY(1); }
+.post-row:hover .post-title { color: var(--c5); }
+
+.post-day {
+  font-family: var(--mono);
+  font-size: 1.2rem;
+  font-weight: 500;
+  padding-top: 1px;
+  text-align: right;
+  padding-right: 18px;
+  user-select: none;
+}
+
+.month-group .post-row:nth-child(7n+1) .post-day { color: var(--red); }
+.month-group .post-row:nth-child(7n+2) .post-day { color: var(--orange); }
+.month-group .post-row:nth-child(7n+3) .post-day { color: var(--pink); }
+.month-group .post-row:nth-child(7n+4) .post-day { color: var(--green); }
+.month-group .post-row:nth-child(7n+5) .post-day { color: var(--light-blue); }
+.month-group .post-row:nth-child(7n+6) .post-day { color: var(--purple); }
+.month-group .post-row:nth-child(7n+0) .post-day { color: var(--blue); }
+
+.post-title {
+  font-size: 1.2rem;
+  font-weight: 400;
+  color: var(--text-color);
+  line-height: 1.5;
+  transition: color .15s;
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  flex-wrap: wrap;
+  cursor: url('/pointer.svg') 0 0, pointer;
+}
+
+.tag {
+  font-family: var(--mono);
+  font-size: 1rem;
+  letter-spacing: .04em;
+  background: none;
+  font-weight: 400;
+  transition: opacity .15s;
+  text-decoration: none;
+  cursor: url('/pointer.svg') 0 0, pointer;
+}
+
+.tag:hover { opacity: .65; }
+
+.post-row:nth-child(1) .tag { color: var(--blue); }
+.post-row:nth-child(2) .tag { color: var(--purple); }
+.post-row:nth-child(3) .tag { color: var(--light-blue); }
+.post-row:nth-child(4) .tag { color: var(--pink); }
+.post-row:nth-child(5) .tag { color: var(--green); }
+.post-row:nth-child(6) .tag { color: var(--orange); }
+.post-row:nth-child(7) .tag { color: var(--red); }
+
+
+.post-row:nth-of-type(7n+1):hover .post-title { color: var(--red); }
+.post-row:nth-of-type(7n+2):hover .post-title { color: var(--orange); }
+.post-row:nth-of-type(7n+3):hover .post-title { color: var(--pink); }
+.post-row:nth-of-type(7n+4):hover .post-title { color: var(--green); }
+.post-row:nth-of-type(7n+5):hover .post-title { color: var(--light-blue); }
+.post-row:nth-of-type(7n+6):hover .post-title { color: var(--purple); }
+.post-row:nth-of-type(7n+0):hover .post-title { color: var(--blue); }
+
+</style>
+<div class="post-list">
+
+
+     <div class="col">
+         <span class="year-sep">2026</span>
+
+        <!-- February -->
+        <div class="month-group">
+          <div class="month-label"><span>February</span></div>
+          <div class="post-row" onclick="showPage('article')">
+            <span class="post-day">25</span>
+            <span class="post-title">I turned 27: everyzthing I learned this year <a href="#" class="tag">#life</a><a href="#" class="tag">#delusion</a></span>
+          </div>
+          <div class="post-row">
+            <span class="post-day">12</span>
+            <span class="post-title">My first roll of film through the Fuji X100VI <a href="#" class="tag">#photo</a></span>
+          </div>
+          <div class="post-row">
+            <span class="post-day">03</span>
+            <span class="post-title">Why I stopped optimising my dev setup <a href="#" class="tag">#dev</a></span>
+          </div>
+        </div>
+
+        <!-- January -->
+        <div class="month-group">
+          <div class="month-label"><span>January</span></div>
+          <div class="post-row">
+            <span class="post-day">28</span>
+            <span class="post-title">Golden hour photo walk through Belagavi <a href="#" class="tag">#photo</a></span>
+          </div>
+          <div class="post-row">
+            <span class="post-day">17</span>
+            <span class="post-title">Spring Boot + Angular: what I'd do differently <a href="#" class="tag">#dev</a></span>
+          </div>
+          <div class="post-row">
+            <span class="post-day">08</span>
+            <span class="post-title">Things that actually stayed in my memory <a href="#" class="tag">#life</a></span>
+          </div>
+        </div>
+
+        <!-- 2025 -->
+        <span class="year-sep">2025</span>
+
+        <!-- December -->
+        <div class="month-group">
+          <div class="month-label"><span>December</span></div>
+          <div class="post-row">
+            <span class="post-day">31</span>
+            <span class="post-title">End of year notes <a href="#" class="tag">#life</a></span>
+          </div>
+          <div class="post-row">
+            <span class="post-day">20</span>
+            <span class="post-title">Composition rules I keep breaking on purpose <a href="#" class="tag">#photo</a></span>
+          </div>
+          <div class="post-row">
+            <span class="post-day">09</span>
+            <span class="post-title">How I think about learning new technologies <a href="#" class="tag">#dev</a></span>
+          </div>
+        </div>
+
+        <!-- November -->
+        <div class="month-group">
+          <div class="month-label"><span>November</span></div>
+          <div class="post-row">
+            <span class="post-day">22</span>
+            <span class="post-title">The gap between knowing and understanding <a href="#" class="tag">#dev</a></span>
+          </div>
+          <div class="post-row">
+            <span class="post-day">14</span>
+            <span class="post-title">Slow photography <a href="#" class="tag">#photo</a></span>
+          </div>
+          <div class="post-row">
+            <span class="post-day">02</span>
+            <span class="post-title">Notes on being 26 <a href="#" class="tag">#life</a></span>
+          </div>
+        </div>
+
+     </div>
+</div>
