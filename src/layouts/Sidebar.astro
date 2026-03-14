@@ -67,7 +67,7 @@ const { page } = Astro.props;
   }
 
   .site-name span::after {
-    content: '';
+    content: "";
     display: block;
     position: absolute;
     width: 104%;
@@ -141,7 +141,7 @@ const { page } = Astro.props;
     }
 
     .nav li a.nav-link::after {
-      content: '';
+      content: "";
       display: block;
       width: 4px;
       height: 0;
@@ -171,25 +171,6 @@ const { page } = Astro.props;
 
     .nav li a.rss-link span {
       display: inherit;
-    }
-  }
-
-  .lorikeet {
-    position: absolute;
-    width: 60vw;
-    left: -24vw;
-    top: -2vw;
-    transform: rotate(20deg);
-    min-height: 200px;
-  }
-
-  @media (min-width: 640px) {
-    .lorikeet {
-      position: unset;
-      width: 120%;
-      transform: rotate(0deg);
-      left: unset;
-      top: unset;
     }
   }
 
@@ -223,7 +204,7 @@ const { page } = Astro.props;
     display: none;
   }
 
-  input[type='checkbox'] {
+  input[type="checkbox"] {
     -webkit-appearance: none;
     appearance: none;
     margin: 0;
@@ -238,8 +219,8 @@ const { page } = Astro.props;
     place-content: center;
   }
 
-  input[type='checkbox']::before {
-    content: '';
+  input[type="checkbox"]::before {
+    content: "";
     width: 0.65em;
     height: 0.65em;
     transform: scale(0);
@@ -251,11 +232,11 @@ const { page } = Astro.props;
     );
   }
 
-  :global(.rainbows) input[type='checkbox']::before {
+  :global(.rainbows) input[type="checkbox"]::before {
     background-image: var(--gradient-color);
   }
 
-  input[type='checkbox']:checked::before {
+  input[type="checkbox"]:checked::before {
     transform: scale(1);
   }
 
@@ -268,42 +249,81 @@ const { page } = Astro.props;
       font-size: 1rem;
     }
   }
+  .imgAnchor {
+    margin-bottom: 0% !important;
+    display: block;
+    height: 10vh;
+  }
+  .sidebar .imgAnchor .brandImg {
+    position: absolute;
+    width: 70vw;
+    left: -20vw;
+    top: 0;
+    transform: rotate(10deg);
+    /* min-height: 100px; */
+    /* position: fixed; */
+    z-index: 99999;
+  }
+
+  @media (min-width: 640px) {
+    .imgAnchor {
+      margin-bottom: 20% !important;
+      display: block;
+      height: 30vh;
+    }
+    .sidebar .imgAnchor .brandImg {
+      position: absolute;
+      width: 25vw;
+      left: -5vw;
+      top: 0;
+      transform: rotate(10deg);
+      min-height: 100px;
+      /* position: fixed; */
+      z-index: 99999;
+    }
+  }
 </style>
 
 <div class="sidebar">
-  <a href="/"
-    ><img class="lorikeet" src="/images/lori.png" alt="Sanket Maske" /></a
-  >
+  <div class="imgAnchor">
+    <a href="/"
+      ><img
+        class="brandImg"
+        src="/assets/images/peacock.png"
+        alt="Sanket Maske"
+      /></a
+    >
+  </div>
   <a href="/" class="site-name-link"
     ><div class="site-name">
-      <span>Sanket's</span><span>Garden</span><span>Of</span><span>Thoughts</span>
+      <span>Sanket's</span><span>Garden</span><span>Of</span><span
+        >Thoughts</span
+      >
     </div></a
   >
   <nav class="nav">
     <ul>
       <li>
-        <a class:list={{ active: page === 'posts', 'nav-link': true }} href="/"
+        <a class:list={{ active: page === "posts", "nav-link": true }} href="/"
           >Posts</a
         >
       </li>
       <li>
         <a
-          class:list={{ active: page === 'tags', 'nav-link': true }}
+          class:list={{ active: page === "tags", "nav-link": true }}
           href="/tags/">Tags</a
         >
       </li>
       <li>
         <a
-          class:list={{ active: page === 'about', 'nav-link': true }}
+          class:list={{ active: page === "about", "nav-link": true }}
           href="/about/">About</a
         >
       </li>
-      
     </ul>
   </nav>
 
   <ul class="settings">
-
     <li class="cursor-trails-setting">
       <label for="cursor-trails">cursor trails</label><input
         id="cursor-trails"
