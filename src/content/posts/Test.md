@@ -1,7 +1,7 @@
 ---
 title: Test sdskd hdjskahd sdjkshdj sajdhjsk djksahjkd sadhjksahd jsahdjk sajkh fdfdh djkfhgjdks
 date: 2026-03-14
-id: Test
+slug: Test
 tags: ['sdksh', 'delusion']
 draft: false
 ---

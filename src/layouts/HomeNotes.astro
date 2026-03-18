@@ -198,7 +198,7 @@ years.forEach(y => y.months.sort((a, b) => b.date - a.date));
           <div class="month-group">
             <div class="month-label"><span>{month.name}</span></div>
             {month.posts.map(post => (
-              <div class="post-row" onclick={`window.location='/blog/${post.id}'`}>
+              <div class="post-row" onclick={`window.location='/blog/${post.slug}'`}>
                 <span class="post-day">{post.day}</span>
                 <span class="post-title">
                   {post.data.title}
