@@ -1,0 +1,95 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection, getEntry, render } from 'astro:content';
+import DocumentHead from '../../layouts/DocumentHead.astro';
+const { slug } = Astro.params;
+const { note } = Astro.props;
+
+
+export async function getStaticPaths() {
+  const notes = await getCollection('posts');
+ console.log(notes.map(n => n.id));
+  return [
+    ...notes.map((note) => ({
+      params: { slug: note.id.replace('.md', '') },
+      props: { note },
+    })),
+    
+  ];
+}
+
+export function formatDate(date) {
+  return date.toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  });
+}
+const {
+  data: { tags, title },
+} = note;
+
+const { Content } = await render(note);
+
+const permalink = '{URL}';
+---
+
+
+
+<style> 
+  h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0;
+    line-height: 1;
+  }
+
+  .meta {
+    margin: 2em 0;
+    padding: 0.5em 0;
+    border-top: 1px dashed var(--text-color);
+    color: var(--second-text-color);
+  }
+
+  .meta .tags {
+    list-style: none;
+    display: flex;
+    margin: 0;
+    padding: 0;
+  }
+
+  .meta .added-updated {
+    font-size: 0.9em;
+    text-transform: uppercase;
+  }
+
+  :global(#footnote-label) {
+    font-size: 1.2rem;
+    text-transform: uppercase;
+  }
+
+  .thanks-for-reading {
+    margin: 4rem 0;
+  }
+</style>
+
+<html lang="en">
+  <DocumentHead title={title} permalink={permalink} />
+    <body>
+    <Layout page="note">
+          <article>
+        <h1 class="title">{title}</h1>
+        <div class="meta">
+          <span class="added-updated"
+            >
+          </span>
+
+          <!-- <TagsList tags={tags.map((t) => ({ name: t }))} /> -->
+        </div>
+        <div class="styled-link-underlines">
+          
+          <Content />
+        </div>
+      </article>
+    </Layout>
+    </body>
+</html>
