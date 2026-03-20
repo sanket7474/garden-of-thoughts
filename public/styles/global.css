@@ -95,8 +95,8 @@
 
     :root {
       --sidebar-width: 260px;
-      --font-mono:
-        Menlo, Consolas, Monaco, Liberation Mono, Lucida Console, monospace;
+      --font-secondary: Menlo, Consolas, Monaco, Liberation Mono, Lucida Console, monospace;
+      --font-mono: "Cascadia Mono", sans-serif;
       --background-color: #f2f0e9;
       --text-color: #0b1733;
       --second-text-color: #3f434d;

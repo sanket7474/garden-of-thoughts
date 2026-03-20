@@ -1,5 +1,5 @@
 ---
-title: Test sdskd hdjskahd sdjkshdj sajdhjsk djksahjkd sadhjksahd jsahdjk sajkh fdfdh djkfhgjdks
+title: Write about the future you wantdh djkfhgjdks
 date: 2026-03-14
 slug: Test
 tags: ['sdksh', 'delusion']
