@@ -249,20 +249,27 @@ const { page } = Astro.props;
       font-size: 1rem;
     }
   }
+
   .imgAnchor {
     margin-bottom: 0% !important;
     display: block;
     height: 10vh;
   }
+
   .sidebar .imgAnchor .brandImg {
     position: absolute;
     width: 70vw;
     left: -20vw;
     top: 0;
-    transform: rotate(10deg);
-    /* min-height: 100px; */
-    /* position: fixed; */
+    display: block;
     z-index: 99999;
+    transform: rotate(10deg) scale(1);
+    transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    cursor: pointer;
+  }
+
+  .sidebar .imgAnchor .brandImg:hover {
+    transform: rotate(10deg) scale(1.3);
   }
 
   @media (min-width: 640px) {
@@ -271,34 +278,22 @@ const { page } = Astro.props;
       display: block;
       height: 30vh;
     }
+
     .sidebar .imgAnchor .brandImg {
-      position: absolute;
       width: 25vw;
       left: -5vw;
-      top: 0;
-      transform: rotate(10deg);
       min-height: 100px;
-      /* position: fixed; */
-      z-index: 99999;
     }
   }
 </style>
 
 <div class="sidebar">
   <div class="imgAnchor">
-    <a href="/"
-      ><img
-        class="brandImg"
-        src="/assets/images/peacock.png"
-        alt="Sanket Maske"
-      /></a
-    >
+    <canvas id="peacock-canvas" class="brandImg"></canvas>
   </div>
   <a href="/" class="site-name-link"
     ><div class="site-name">
-      <span>Garden</span><span>Of</span><span
-        >Thoughts</span
-      >
+      <span>Garden</span><span>Of</span><span>Thoughts</span>
     </div></a
   >
   <nav class="nav">
@@ -338,3 +333,124 @@ const { page } = Astro.props;
     </li>
   </ul>
 </div>
+
+<script>
+  const canvas = document.getElementById("peacock-canvas") as HTMLCanvasElement;
+  const ctx = canvas.getContext("2d")!;
+  const SIZE = 1000;
+  canvas.width = SIZE;
+  canvas.height = SIZE;
+
+  canvas.style.cursor = "pointer";
+  canvas.addEventListener("click", () => (window.location.href = "/"));
+
+   // Navigate on click
+  canvas.addEventListener("click", () => (window.location.href = "/"));
+ 
+  // Hover scale via JS — bypasses Astro CSS scoping issues
+  canvas.addEventListener("mouseenter", () => {
+    canvas.style.transform = "rotate(10deg) scale(1.3)";
+  });
+  canvas.addEventListener("mouseleave", () => {
+    canvas.style.transform = "rotate(10deg) scale(1)";
+  });
+
+  const img = new Image();
+  img.src = "/assets/images/peacock.png";
+
+  img.onload = () => {
+    const src = document.createElement("canvas");
+    src.width = SIZE;
+    src.height = SIZE;
+    const sctx = src.getContext("2d")!;
+    sctx.drawImage(img, 0, 0, SIZE, SIZE);
+    const srcData = sctx.getImageData(0, 0, SIZE, SIZE);
+    const out = ctx.createImageData(SIZE, SIZE);
+
+    const JX = 600,
+      JY = 560;
+    const weights = new Float32Array(SIZE * SIZE);
+    const progress = new Float32Array(SIZE * SIZE);
+
+    for (let y = 0; y < SIZE; y++) {
+      for (let x = 0; x < SIZE; x++) {
+        const i = y * SIZE + x;
+        const dx = x - JX,
+          dy = y - JY;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist > 780) {
+          weights[i] = 0;
+          continue;
+        }
+
+        const angle = (Math.atan2(dy, dx) * 180) / Math.PI;
+        const a360 = angle < 0 ? angle + 360 : angle;
+        if (a360 > 215 && a360 < 315) {
+          weights[i] = 0;
+          continue;
+        }
+
+        const innerFade = dist < 180 ? (dist / 180) * (dist / 180) : 1;
+
+        let angleFade = 1;
+        const edgeSoft = 25;
+        const distFrom215 = Math.min(
+          Math.abs(a360 - 215),
+          360 - Math.abs(a360 - 215)
+        );
+        const distFrom315 = Math.min(
+          Math.abs(a360 - 315),
+          360 - Math.abs(a360 - 315)
+        );
+        const nearestEdge = Math.min(distFrom215, distFrom315);
+        if (nearestEdge < edgeSoft) angleFade = nearestEdge / edgeSoft;
+
+        const prog = Math.min(1, Math.max(0, dist / 760));
+        progress[i] = prog;
+        const rampOut = prog > 0.9 ? (1 - prog) / 0.1 : 1;
+        weights[i] = innerFade * angleFade * rampOut;
+      }
+    }
+
+    let t = 0;
+    function frame() {
+      t += 0.016;
+      const sd = srcData.data,
+        od = out.data;
+      for (let y = 0; y < SIZE; y++) {
+        for (let x = 0; x < SIZE; x++) {
+          const i = y * SIZE + x,
+            idx = i * 4;
+          const w = weights[i];
+          if (w === 0) {
+            od[idx] = sd[idx];
+            od[idx + 1] = sd[idx + 1];
+            od[idx + 2] = sd[idx + 2];
+            od[idx + 3] = sd[idx + 3];
+            continue;
+          }
+          const dist = Math.sqrt((x - JX) ** 2 + (y - JY) ** 2);
+          const phase = dist * 0.01;
+          const dispX = Math.sin(t - phase) * w * 11;
+          const dispY = Math.sin(t * 1.6 - phase * 1.2 + 0.9) * w * 4;
+          const micro = Math.sin(t * 3.1 - phase * 2.5 + x * 0.025) * w * 2.5;
+          const sx = Math.max(
+            0,
+            Math.min(SIZE - 1, Math.round(x - dispX - micro))
+          );
+          const sy = Math.max(0, Math.min(SIZE - 1, Math.round(y - dispY)));
+          const si = (sy * SIZE + sx) * 4;
+          od[idx] = sd[si];
+          od[idx + 1] = sd[si + 1];
+          od[idx + 2] = sd[si + 2];
+          od[idx + 3] = sd[si + 3];
+        }
+      }
+      ctx.putImageData(out, 0, 0);
+      requestAnimationFrame(frame);
+    }
+    frame();
+  };
+
+  
+</script>
