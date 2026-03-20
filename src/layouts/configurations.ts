@@ -9,14 +9,14 @@ const checkboxValues = {
 
 let trailsScriptsInjected = false;
 
-function disableOption(option) {
+function disableOption(option:any) {
   document.documentElement.classList.add('rainbows');
   document.documentElement.classList.remove(option);
   if (option === configurations.darkMode)
     document.documentElement.style.colorScheme = 'light';
   window.localStorage.setItem(option, 'false');
 }
-function enableOption(option) {
+function enableOption(option:any) {
 
   document.documentElement.classList.add('rainbows');
   document.documentElement.classList.add(option);

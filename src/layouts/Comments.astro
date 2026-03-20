@@ -1,0 +1,193 @@
+---
+const { slug, noComments } = Astro.props;
+
+import { getEntry } from 'astro:content';
+import CommentsList from './CommentsList.astro';
+
+const commentsEntry = await getEntry('comments', slug);
+const comments = commentsEntry?.data?.comments || [];
+---
+
+<style>
+  form p {
+    margin: 0;
+    margin-bottom: 0.5rem;
+  }
+
+  form label {
+    display: block;
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: var(--text-color);
+    opacity: 0.8;
+  }
+
+  form input,
+  form textarea {
+    display: block;
+    width: 80%;
+    font-size: 1.2rem;
+    font-family: var(--font-family);
+    padding: 0.2rem 0.5rem;
+    background-color: rgba(255, 255, 255, 0.7);
+    outline: none;
+    border: none;
+    border-radius: 10px;;
+  }
+
+  form input {
+    min-height: 40px;
+  }
+
+  :global(.dark-mode) form input,
+  :global(.dark-mode) form textarea {
+    background-color: rgba(0, 0, 0, 0.2);
+    color: white;
+  }
+
+  form textarea {
+    height: 10em;
+  }
+
+  .comment-submitted {
+    display: none;
+  }
+
+  .submit-button {
+    background: var(--accent-color);
+    color: white;
+    font-size: 1.2rem;
+    font-weight: bold;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    margin: 1%;
+  }
+
+  :global(.rainbows) .submit-button {
+    background: var(--gradient-color);
+  }
+
+  .info {
+    font-weight: normal;
+  }
+
+  .your-website-here {
+    display: none;
+  }
+  label {
+    margin: 1% 0;;
+  }
+
+.rainbow-button {
+  padding: 14px 28px;
+  font-size: 1.2rem;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  outline: none;
+  font-family: var(--mono);
+  font-weight: 500;
+
+  background: linear-gradient(
+    90deg,
+    #ff0000, #ff7300, #fffb00,
+    #48ff00, #00ffd5, #00e8f0,
+    #245cf7, #7a00ff, #ff00c8,
+    #ff0000
+  );
+  background-size: 400% 100%;
+  animation: smoothRainbow 20s linear infinite;
+}
+
+@keyframes smoothRainbow {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 400% 50%; }
+}
+
+.rainbow-button:hover {
+  transform: scale(1.05);
+  
+}
+
+
+
+</style>
+
+<section class="comments">
+  <h2 id="comments">Comments</h2>
+  { noComments ? (
+    <p>Comments are turned off for this note because for some reason, spammers love it 🤷🏻‍♀️</p>
+  ) : (<CommentsList
+    parentId={null}
+    allComments={comments}
+    startIndex={Math.floor(Math.random() * 6)}
+  />
+  <h3>Leave a Comment</h3>
+  <p id="comment-submitted" class="comment-submitted">
+    💯 Thanks for submitting your comment! It will appear here after it has been
+    approved.
+  </p>
+  <form
+    name="comment"
+    method="POST"
+    data-netlify="true"
+    id="comment-form"
+    netlify-honeypot="url-field"
+  >
+    <input type="hidden" name="slug" value={slug} />
+    <p>
+      <label for="comment"
+        >Comment <span class="info"
+          >(You can use <a href="https://www.markdownguide.org/basic-syntax/"
+            >Markdown syntax</a
+          > if you wish)</span
+        ></label
+      >
+      <textarea name="comment" id="comment" required></textarea>
+    </p>
+    <p>
+      <label for="name">Name</label><input
+        type="text"
+        name="name"
+        id="name"
+        required
+      />
+    </p>
+  
+    <p>
+      <button type="submit" class="rainbow-button">Submit</button>
+    </p>
+  </form>
+  <script>
+    // @ts-nocheck
+    const handleSubmit = (event) => {
+      event.preventDefault();
+
+      const myForm = event.target;
+      const formData = new FormData(myForm);
+
+      fetch('/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(formData.entries()).toString(),
+      })
+        .then(() => {
+          myForm.reset();
+          const commentSubmittedMessage =
+            document.querySelector('#comment-submitted');
+          commentSubmittedMessage.style.display = 'block';
+          commentSubmittedMessage.scrollIntoView();
+        })
+        .catch((error) => alert(error));
+    };
+
+    // @ts-ignore
+    document
+      .querySelector('#comment-form')
+      .addEventListener('submit', handleSubmit);
+  </script>
+  )}
+</section>

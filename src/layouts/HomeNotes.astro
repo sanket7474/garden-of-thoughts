@@ -2,11 +2,14 @@
 import { getCollection } from 'astro:content';
 import { monthNames } from '../data/postConfig';
 
+// @ts-nocheck
+// @ts-ignore
+
 const allPosts = await getCollection('posts', ({ data }) => !data.draft);
 
 allPosts.sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime());
 
-const years = [];
+const years:any = [];
 
 allPosts.forEach(post => {
   const date = new Date(post.data.date);
@@ -29,8 +32,8 @@ allPosts.forEach(post => {
   month.posts.push({ ...post, day });
 });
 
-years.sort((a, b) => b.date - a.date);
-years.forEach(y => y.months.sort((a, b) => b.date - a.date));
+years.sort((a:any, b:any) => b.date - a.date);
+years.forEach(y => y.months.sort((a:any, b:any) => b.date - a.date));
 ---
 <style>
 
@@ -191,18 +194,25 @@ years.forEach(y => y.months.sort((a, b) => b.date - a.date));
 
 <div class="post-list">
   <div class="col">
-    {years.map(year => (
+    {
+     // @ts-nocheck
+     // @ts-ignore
+    years.map(year => (
       <>
         <span class="year-sep">{year.date}</span>
-        {year.months.map(month => (
+        { // @ts-ignore
+        year.months.map(month => (
           <div class="month-group">
             <div class="month-label"><span>{month.name}</span></div>
-            {month.posts.map(post => (
+            {month.posts.map((post:any) => (
               <div class="post-row" onclick={`window.location='/blog/${post.slug}'`}>
                 <span class="post-day">{post.day}</span>
                 <span class="post-title">
                   {post.data.title}
-                  {post.data.tags.map(tag => (
+                  {
+                    // @ts-nocheck
+                    // @ts-ignore
+                  post.data.tags.map(tag => (
                     <a href={`/tags/${tag}`} class="tag">#{tag}</a>
                   ))}
                 </span>
@@ -216,6 +226,8 @@ years.forEach(y => y.months.sort((a, b) => b.date - a.date));
 </div>
 
 <script>
+  // @ts-nocheck
+     // @ts-ignore
   document.querySelectorAll('.post-title').forEach(title => {
     const tags = title.querySelectorAll('.tag');
     const colors = ['var(--red)', 'var(--orange)', 'var(--pink)', 'var(--green)', 'var(--light-blue)', 'var(--purple)', 'var(--blue)'];

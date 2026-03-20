@@ -1,5 +1,5 @@
 import { defineCollection, z } from 'astro:content'
-
+import { glob } from 'astro/loaders';
 // Define your collection(s)
 
 
@@ -16,7 +16,29 @@ const posts = defineCollection({
     date: z.date(),
     tags: z.array(z.string()),
     draft: z.boolean().optional().default(false),
+    noComments: z.boolean().optional().nullable()
   })
 })
 
-export const collections = { posts }
+
+const comment = z.object({
+  id: z.string(),
+  parentId: z.string().nullable(),
+  createdAt: z.number(),
+  html: z.string(),
+  createdBy: z.object({
+    fullName: z.string(),
+  }),
+});
+
+const commentsCollection = defineCollection({
+  loader: glob({
+    pattern: '*.json',
+    base: './src/content/comments',
+  }),
+  schema: z.object({
+    comments: z.array(comment),
+  }),
+});
+
+export const collections = { posts , comments: commentsCollection}
