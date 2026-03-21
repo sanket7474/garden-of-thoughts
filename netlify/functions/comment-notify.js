@@ -4,7 +4,6 @@ export default async (req) => {
   const name = body.data?.name;
   const comment = body.data?.comment;
   const slug = body.data?.slug;
-  const website = body.data?.website || 'none';
 
   const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL;
 
@@ -16,7 +15,6 @@ export default async (req) => {
         title: `💬 New comment on "${slug}"`,
         fields: [
           { name: 'From', value: name, inline: true },
-          { name: 'Website', value: website, inline: true },
           { name: 'Comment', value: comment },
         ],
         color: 0x57F287,
