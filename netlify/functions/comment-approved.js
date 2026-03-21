@@ -1,20 +1,34 @@
 export default async (req) => {
-  const body = await req.json();
+  let body;
+  try {
+    body = await req.json();
+  } catch (e) {
+    return new Response('Invalid JSON body', { status: 400 });
+  }
 
-  // Netlify sends form data inside body.data
-  const data = body.data;
+  console.log('body received:', JSON.stringify(body));
+
+  const data = body.data || body;
   const name = data?.name;
   const comment = data?.comment;
   const slug = data?.slug;
   const website = data?.website || null;
 
+  console.log('parsed fields:', { name, slug, hasComment: !!comment });
+
   if (!name || !comment || !slug) {
-    return new Response('Missing fields', { status: 400 });
+    return new Response('Missing fields: ' + JSON.stringify({ name: !!name, comment: !!comment, slug: !!slug }), { status: 400 });
   }
 
   const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
-  const GITHUB_REPO = process.env.GITHUB_REPO; // e.g. "sanketmaske/garden-of-thoughts"
+  const GITHUB_REPO = process.env.GITHUB_REPO;
   const BRANCH = process.env.GITHUB_BRANCH || 'main';
+
+  console.log('env check:', { hasToken: !!GITHUB_TOKEN, repo: GITHUB_REPO, branch: BRANCH });
+
+  if (!GITHUB_TOKEN || !GITHUB_REPO) {
+    return new Response('Missing env vars: GITHUB_TOKEN or GITHUB_REPO', { status: 500 });
+  }
 
   const filePath = `src/content/comments/${slug}.json`;
   const apiUrl = `https://api.github.com/repos/${GITHUB_REPO}/contents/${filePath}`;
@@ -25,23 +39,21 @@ export default async (req) => {
     Accept: 'application/vnd.github+json',
   };
 
-  // Check if file already exists
   let existingComments = [];
   let fileSha = null;
 
   const existingRes = await fetch(apiUrl, { headers });
+  console.log('existing file status:', existingRes.status);
 
   if (existingRes.ok) {
     const existingFile = await existingRes.json();
     fileSha = existingFile.sha;
-    const decoded = JSON.parse(atob(existingFile.content.replace(/\n/g, '')));
+    // Use Buffer instead of atob — works on all Node versions
+    const decoded = JSON.parse(Buffer.from(existingFile.content, 'base64').toString('utf-8'));
     existingComments = decoded.comments || [];
+    console.log('existing comments count:', existingComments.length);
   }
-console.log('GITHUB_TOKEN exists:', !!process.env.GITHUB_TOKEN);
-console.log('GITHUB_REPO:', process.env.GITHUB_REPO);
-console.log('GITHUB_BRANCH:', process.env.GITHUB_BRANCH);
-console.log('body received:', JSON.stringify(body));
-  // Build new comment object
+
   const newComment = {
     id: `${Date.now()}`,
     parentId: null,
@@ -53,9 +65,9 @@ console.log('body received:', JSON.stringify(body));
 
   const updatedComments = [...existingComments, newComment];
   const fileContent = JSON.stringify({ comments: updatedComments }, null, 2);
-  const encoded = btoa(unescape(encodeURIComponent(fileContent)));
+  // Use Buffer instead of btoa
+  const encoded = Buffer.from(fileContent, 'utf-8').toString('base64');
 
-  // Create or update the file via GitHub API
   const payload = {
     message: `add comment on ${slug}`,
     content: encoded,
@@ -69,22 +81,21 @@ console.log('body received:', JSON.stringify(body));
     body: JSON.stringify(payload),
   });
 
+  console.log('GitHub push status:', pushRes.status);
+
   if (!pushRes.ok) {
     const err = await pushRes.text();
     console.error('GitHub API error:', err);
-    return new Response('Failed to push to GitHub', { status: 500 });
+    return new Response(`GitHub error ${pushRes.status}: ${err}`, { status: 500 });
   }
 
   return new Response('Comment added', { status: 200 });
 };
 
-// Minimal markdown to HTML converter
-// Handles: bold, italic, inline code, paragraphs
 function markdownToHtml(md) {
   const lines = md.split('\n');
   let html = '';
   let paragraph = '';
-
   for (const line of lines) {
     if (line.trim() === '') {
       if (paragraph.trim()) {
@@ -95,11 +106,9 @@ function markdownToHtml(md) {
       paragraph += (paragraph ? ' ' : '') + line;
     }
   }
-
   if (paragraph.trim()) {
     html += `<p>${formatInline(paragraph.trim())}</p>\n`;
   }
-
   return html;
 }
 
