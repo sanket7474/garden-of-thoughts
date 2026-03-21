@@ -1,0 +1,326 @@
+---
+// src/pages/admin.astro
+---
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin — Garden of Thoughts</title>
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+
+      body {
+        font-family: var(--font-mono, monospace);
+        background: var(--bg, #f9f6f0);
+        color: var(--text, #1a1a1a);
+        min-height: 100vh;
+        padding: 2rem;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+        margin-bottom: 2rem;
+        border-bottom: 1px dashed #ccc;
+        padding-bottom: 1rem;
+      }
+
+      /* ── Login ── */
+      #login-screen {
+        max-width: 360px;
+        margin: 10vh auto;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      #login-screen h1 { border: none; }
+
+      #login-screen input {
+        padding: 0.6rem 1rem;
+        font-size: 1rem;
+        font-family: inherit;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        width: 100%;
+      }
+
+      /* ── Admin ── */
+      #admin-screen { display: none; max-width: 800px; margin: 0 auto; }
+
+      .comment-card {
+        border: 1px solid #ddd;
+        border-radius: 12px;
+        padding: 1.2rem 1.5rem;
+        margin-bottom: 1.5rem;
+        background: white;
+      }
+
+      .comment-meta {
+        font-size: 0.85rem;
+        color: #666;
+        margin-bottom: 0.8rem;
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      .comment-meta strong { color: #1a1a1a; font-size: 1rem; }
+
+      .comment-slug {
+        background: #f0f0f0;
+        padding: 0.15rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+      }
+
+      .comment-body {
+        font-size: 1rem;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+        white-space: pre-wrap;
+        border-left: 3px solid #e5e7eb;
+        padding-left: 0.8rem;
+        color: #333;
+      }
+
+      .actions { display: flex; gap: 0.8rem; }
+
+      button {
+        padding: 0.5rem 1.2rem;
+        font-size: 0.95rem;
+        font-family: inherit;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: opacity 0.15s;
+      }
+
+      button:hover { opacity: 0.85; }
+      button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+      .btn-approve { background: #22c55e; color: white; }
+      .btn-reject  { background: #ef4444; color: white; }
+      .btn-login   { background: #1a1a1a; color: white; width: 100%; padding: 0.7rem; }
+
+      .status {
+        font-size: 0.85rem;
+        margin-top: 0.6rem;
+        min-height: 1.2em;
+      }
+
+      .status.success { color: #22c55e; }
+      .status.error   { color: #ef4444; }
+
+      #empty-state {
+        text-align: center;
+        color: #888;
+        margin-top: 4rem;
+        font-size: 1.1rem;
+      }
+
+      #loading {
+        text-align: center;
+        color: #888;
+        margin-top: 4rem;
+      }
+
+      .error-banner {
+        background: #fef2f2;
+        border: 1px solid #fca5a5;
+        color: #b91c1c;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+
+    <!-- Login -->
+    <div id="login-screen">
+      <h1>🌱 Admin</h1>
+      <input type="password" id="password-input" placeholder="Enter password" />
+      <button class="btn-login" id="login-btn">Enter</button>
+      <p id="login-error" style="color:#ef4444; font-size:0.85rem; display:none">
+        Wrong password
+      </p>
+    </div>
+
+    <!-- Admin -->
+    <div id="admin-screen">
+      <h1>🌱 Pending Comments</h1>
+      <div id="loading">Loading submissions...</div>
+      <div id="error-container"></div>
+      <div id="comments-container"></div>
+      <div id="empty-state" style="display:none">✅ No pending comments</div>
+    </div>
+
+    <script>
+      let sessionPassword = null;
+
+      const loginScreen        = document.getElementById('login-screen');
+      const adminScreen        = document.getElementById('admin-screen');
+      const loginBtn           = document.getElementById('login-btn');
+      const passwordInput      = document.getElementById('password-input');
+      const loginError         = document.getElementById('login-error');
+      const commentsContainer  = document.getElementById('comments-container');
+      const emptyState         = document.getElementById('empty-state');
+      const loadingEl          = document.getElementById('loading');
+      const errorContainer     = document.getElementById('error-container');
+
+      // ─── Login ──────────────────────────────────────────────────
+      loginBtn.addEventListener('click', handleLogin);
+      passwordInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') handleLogin();
+      });
+
+      async function handleLogin() {
+        const password = passwordInput.value;
+        // Test the password against the function
+        const res = await callAdmin({ action: 'list', password });
+        if (res.error === 'Unauthorized') {
+          loginError.style.display = 'block';
+          passwordInput.value = '';
+          return;
+        }
+        sessionPassword = password;
+        loginScreen.style.display = 'none';
+        adminScreen.style.display = 'block';
+        renderSubmissions(res.submissions || []);
+        loadingEl.style.display = 'none';
+      }
+
+      // ─── API helper ─────────────────────────────────────────────
+      async function callAdmin(body) {
+        const res = await fetch('/api/admin-submissions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+        return res.json();
+      }
+
+      // ─── Render ─────────────────────────────────────────────────
+      function renderSubmissions(submissions) {
+        commentsContainer.innerHTML = '';
+
+        if (submissions.length === 0) {
+          emptyState.style.display = 'block';
+          return;
+        }
+
+        submissions.forEach((sub) => {
+          const { id, data, created_at } = sub;
+          const { name, comment, slug, website } = data;
+
+          const card = document.createElement('div');
+          card.className = 'comment-card';
+          card.id = `card-${id}`;
+          card.innerHTML = `
+            <div class="comment-meta">
+              <strong>${name}</strong>
+              ${website ? `<a href="${website}" target="_blank" rel="noopener">${website}</a>` : ''}
+              <span class="comment-slug">${slug}</span>
+              <span>${new Date(created_at).toLocaleString()}</span>
+            </div>
+            <div class="comment-body">${comment}</div>
+            <div class="actions">
+              <button class="btn-approve" data-id="${id}">✅ Approve</button>
+              <button class="btn-reject"  data-id="${id}">❌ Reject</button>
+            </div>
+            <p class="status" id="status-${id}"></p>
+          `;
+          commentsContainer.appendChild(card);
+        });
+
+        document.querySelectorAll('.btn-approve').forEach((btn) =>
+          btn.addEventListener('click', () =>
+            handleApprove(btn.dataset.id, submissions)
+          )
+        );
+        document.querySelectorAll('.btn-reject').forEach((btn) =>
+          btn.addEventListener('click', () => handleReject(btn.dataset.id))
+        );
+      }
+
+      // ─── Approve ────────────────────────────────────────────────
+      async function handleApprove(submissionId, submissions) {
+        const sub = submissions.find((s) => s.id === submissionId);
+        setCardLoading(submissionId, true);
+
+        try {
+          // Push to GitHub
+          const approveRes = await fetch('/api/comment-approved', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ data: sub.data }),
+          });
+          if (!approveRes.ok) throw new Error('Failed to push to GitHub');
+
+          // Delete from Netlify
+          const deleteRes = await callAdmin({
+            action: 'delete',
+            password: sessionPassword,
+            submissionId,
+          });
+          if (deleteRes.error) throw new Error(deleteRes.error);
+
+          setStatus(submissionId, '✅ Approved & published!', 'success');
+          setTimeout(() => removeCard(submissionId), 1500);
+        } catch (err) {
+          setStatus(submissionId, `Error: ${err.message}`, 'error');
+          setCardLoading(submissionId, false);
+        }
+      }
+
+      // ─── Reject ─────────────────────────────────────────────────
+      async function handleReject(submissionId) {
+        setCardLoading(submissionId, true);
+
+        try {
+          const res = await callAdmin({
+            action: 'delete',
+            password: sessionPassword,
+            submissionId,
+          });
+          if (res.error) throw new Error(res.error);
+
+          setStatus(submissionId, '❌ Rejected & deleted', 'error');
+          setTimeout(() => removeCard(submissionId), 1500);
+        } catch (err) {
+          setStatus(submissionId, `Error: ${err.message}`, 'error');
+          setCardLoading(submissionId, false);
+        }
+      }
+
+      // ─── Helpers ────────────────────────────────────────────────
+      function setCardLoading(id, loading) {
+        document
+          .getElementById(`card-${id}`)
+          .querySelectorAll('button')
+          .forEach((b) => (b.disabled = loading));
+      }
+
+      function setStatus(id, message, type) {
+        const el = document.getElementById(`status-${id}`);
+        el.textContent = message;
+        el.className = `status ${type}`;
+      }
+
+      function removeCard(id) {
+        const card = document.getElementById(`card-${id}`);
+        card.style.transition = 'opacity 0.3s';
+        card.style.opacity = '0';
+        setTimeout(() => {
+          card.remove();
+          if (commentsContainer.children.length === 0) {
+            emptyState.style.display = 'block';
+          }
+        }, 300);
+      }
+    </script>
+  </body>
+</html>
