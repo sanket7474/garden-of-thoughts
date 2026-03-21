@@ -1,15 +1,16 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import { getCollection, getEntry, render } from "astro:content";
+import { getCollection, render } from "astro:content";
 import DocumentHead from "../../layouts/DocumentHead.astro";
 import Comments from "../../layouts/Comments.astro";
 
 const { slug } = Astro.params;
 const { note } = Astro.props;
 
+
 export async function getStaticPaths() {
   const notes = await getCollection("posts");
-  console.log(notes.map((n) => n.id));
+  
   return [
     ...notes.map((note) => ({
       params: { slug: note.id.replace(".md", "") },
