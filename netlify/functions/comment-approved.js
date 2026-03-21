@@ -37,7 +37,10 @@ export default async (req) => {
     const decoded = JSON.parse(atob(existingFile.content.replace(/\n/g, '')));
     existingComments = decoded.comments || [];
   }
-
+console.log('GITHUB_TOKEN exists:', !!process.env.GITHUB_TOKEN);
+console.log('GITHUB_REPO:', process.env.GITHUB_REPO);
+console.log('GITHUB_BRANCH:', process.env.GITHUB_BRANCH);
+console.log('body received:', JSON.stringify(body));
   // Build new comment object
   const newComment = {
     id: `${Date.now()}`,
