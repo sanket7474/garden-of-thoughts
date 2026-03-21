@@ -8,46 +8,6 @@
       },
       "html": "<p>How it wworks?</p>\n",
       "createdAt": 1774117924042
-    },
-    {
-<<<<<<< HEAD
-      "id": "1774117924042",
-      "parentId": null,
-      "createdBy": {
-        "fullName": "Pratik"
-      },
-      "html": "<p>How it wworks jfj?</p>\n",
-      "createdAt": 1774117924042,
-      "replies": ["Yes"]
-    },
-    {
-      "id": "7e0ff54e-761d-48ff-b2fe-8156e126142d",
-      "parentId": "1774117924042",
-      "html": "<p>Hey Rodrigo, thanks very much for your comment. You should definitely start writing! Every day I have thoughts along the lines of &quot;why bother? who even wants to read this?&quot; but as I enjoy the process of writing itself and wish to get better at writing, I just keep going with it. Cheers.</p>\n",
-      "createdBy": {
-        "id": 100,
-        "fullName": "Sanket Maske"
-      },
-      "createdAt": 1614388583693,
-      "replies": []
-=======
-      "id": "1774120705068",
-      "parentId": null,
-      "createdBy": {
-        "fullName": "Tasty"
-      },
-      "html": "<p>Testttt</p>\n",
-      "createdAt": 1774120705068
-    },
-    {
-      "id": "1774120705930",
-      "parentId": null,
-      "createdBy": {
-        "fullName": "Testtt"
-      },
-      "html": "<p>Test</p>\n",
-      "createdAt": 1774120705930
->>>>>>> 989f9b522932433b2f619d26b75dda229d04bc88
     }
   ]
 }
