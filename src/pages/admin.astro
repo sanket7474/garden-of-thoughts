@@ -1,501 +1,458 @@
 ---
 // src/pages/admin.astro
+// Standalone — does NOT use Layout.astro or global.css
 ---
 
-<html lang="en" data-theme="dark">
+<!DOCTYPE html>
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin — Garden of Thoughts</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;1,400;1,500&family=IBM+Plex+Mono:wght@400;500&family=Karla:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Cascadia+Mono:ital,wght@0,200..700;1,200..700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;1,400&family=Cascadia+Mono:wght@400;500&display=swap" rel="stylesheet" />
     <style>
-      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-      :root {
-        --bg:           #0f1128;
-        --text:         #f2f0e9;
-        --text-muted:   #c9c6d1;
-        --border:       #c76399;
-        --card-bg:      #1e2352;
-        --card-hover:   #252a60;
-        --accent:       #c76399;
-        --green:        #48a71e;
-        --red:          #db5c55;
-        --purple:       #867cc0;
-        --font-body:    'Karla', sans-serif;
-        --font-mono:    'Cascadia Mono', monospace;
-        --font-serif:   'Lora', serif;
-      }
+      *, *::before, *::after { box-sizing: border-box !important; margin: 0 !important; padding: 0 !important; }
 
       html, body {
-        height: 100%;
-        background: var(--bg);
-        color: var(--text);
-        font-family: var(--font-body);
-        font-size: 1rem;
-        line-height: 1.6;
+        background: #0c0f24 !important;
+        color: #f2f0e9 !important;
+        font-family: 'Cascadia Mono', monospace !important;
+        font-size: 14px !important;
+        line-height: 1.6 !important;
+        min-height: 100vh !important;
       }
 
-      /* ── Login ───────────────────────────────────────── */
+      /* ── Login ─────────────────────────── */
       #login-screen {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        min-height: 100vh;
-        gap: 0;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        min-height: 100vh !important;
       }
 
       .login-box {
-        width: 100%;
-        max-width: 380px;
-        padding: 2.5rem;
-        border: 1px solid var(--border);
-        border-radius: 16px;
-        background: var(--card-bg);
-        display: flex;
-        flex-direction: column;
-        gap: 1.2rem;
+        width: 360px !important;
+        background: #171a3a !important;
+        border: 1px solid #c76399 !important;
+        border-radius: 16px !important;
+        padding: 2.5rem !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 1.2rem !important;
       }
 
       .login-title {
-        font-family: var(--font-serif);
-        font-size: 1.6rem;
-        font-style: italic;
-        color: var(--text);
-        margin-bottom: 0.2rem;
+        font-family: 'Lora', serif !important;
+        font-size: 1.5rem !important;
+        font-style: italic !important;
+        color: #f2f0e9 !important;
+        display: block !important;
       }
 
-      .login-subtitle {
-        font-size: 0.85rem;
-        color: var(--text-muted);
-        font-family: var(--font-mono);
-        letter-spacing: 0.04em;
+      .login-sub {
+        font-size: 0.72rem !important;
+        color: #9896a4 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.08em !important;
+        display: block !important;
+        margin-top: 0.3rem !important;
       }
 
       .field-label {
-        display: block;
-        font-family: var(--font-mono);
-        font-size: 0.75rem;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        color: var(--text-muted);
-        margin-bottom: 0.4rem;
+        display: block !important;
+        font-size: 0.7rem !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.08em !important;
+        color: #9896a4 !important;
+        margin-bottom: 0.4rem !important;
       }
 
       .field-input {
-        width: 100%;
-        padding: 0.65rem 1rem;
-        font-size: 1rem;
-        font-family: var(--font-mono);
-        background: rgba(255,255,255,0.05);
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        color: var(--text);
-        outline: none;
-        transition: border-color 0.2s;
+        display: block !important;
+        width: 100% !important;
+        background: rgba(255,255,255,0.06) !important;
+        border: 1px solid rgba(199,99,153,0.4) !important;
+        border-radius: 8px !important;
+        padding: 0.65rem 1rem !important;
+        font-size: 0.95rem !important;
+        font-family: 'Cascadia Mono', monospace !important;
+        color: #f2f0e9 !important;
+        outline: none !important;
       }
 
-      .field-input:focus { border-color: var(--accent); }
+      .field-input:focus { border-color: #c76399 !important; }
 
       .login-error {
-        font-family: var(--font-mono);
-        font-size: 0.8rem;
-        color: var(--red);
-        display: none;
+        color: #f87171 !important;
+        font-size: 0.78rem !important;
+        display: none !important;
       }
 
-      /* ── Buttons ─────────────────────────────────────── */
+      /* ── Buttons ───────────────────────── */
       .btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.4rem;
-        padding: 0.55rem 1.2rem;
-        font-size: 0.9rem;
-        font-family: var(--font-mono);
-        font-weight: 500;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: opacity 0.15s, transform 0.1s;
-        letter-spacing: 0.02em;
+        font-family: 'Cascadia Mono', monospace !important;
+        font-size: 0.82rem !important;
+        font-weight: 500 !important;
+        padding: 0.5rem 1.1rem !important;
+        border-radius: 8px !important;
+        border: none !important;
+        cursor: pointer !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 0.3rem !important;
+        transition: opacity 0.15s, transform 0.1s !important;
       }
 
-      .btn:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
-      .btn:active:not(:disabled) { transform: translateY(0); }
-      .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+      .btn:hover:not(:disabled) { opacity: 0.85 !important; transform: translateY(-1px) !important; }
+      .btn:disabled { opacity: 0.35 !important; cursor: not-allowed !important; }
 
-      .btn-primary  { background: var(--accent); color: white; width: 100%; justify-content: center; padding: 0.75rem; font-size: 1rem; }
-      .btn-approve  { background: #1a3d1f; color: #4ade80; border: 1px solid #2d6b36; }
-      .btn-reject   { background: #3d1a1a; color: #f87171; border: 1px solid #6b2d2d; }
+      .btn-login {
+        background: #c76399 !important;
+        color: #fff !important;
+        width: 100% !important;
+        justify-content: center !important;
+        padding: 0.75rem !important;
+        font-size: 0.95rem !important;
+        border-radius: 10px !important;
+      }
 
-      /* ── Admin layout ────────────────────────────────── */
+      .btn-approve {
+        background: #0f2e14 !important;
+        color: #4ade80 !important;
+        border: 1px solid #1e5c28 !important;
+      }
+
+      .btn-reject {
+        background: #2e0f0f !important;
+        color: #f87171 !important;
+        border: 1px solid #5c1e1e !important;
+      }
+
+      /* ── Admin page ────────────────────── */
       #admin-screen {
-        display: none;
-        max-width: 1100px;
-        margin: 0 auto;
-        padding: 3rem 1.5rem 6rem;
+        display: none !important;
+        max-width: 1100px !important;
+        margin: 0 auto !important;
+        padding: 2.5rem 1.5rem 5rem !important;
       }
 
       .admin-header {
-        margin-bottom: 2.5rem;
-        padding-bottom: 1.5rem;
-        border-bottom: 1px dashed var(--border);
+        margin-bottom: 2rem !important;
+        padding-bottom: 1.2rem !important;
+        border-bottom: 1px dashed rgba(199,99,153,0.4) !important;
       }
 
       .admin-title {
-        font-family: var(--font-serif);
-        font-size: 2rem;
-        font-style: italic;
-        color: var(--text);
+        font-family: 'Lora', serif !important;
+        font-size: 1.9rem !important;
+        font-style: italic !important;
+        color: #f2f0e9 !important;
+        display: block !important;
       }
 
-      .admin-subtitle {
-        font-family: var(--font-mono);
-        font-size: 0.8rem;
-        color: var(--text-muted);
-        margin-top: 0.3rem;
-        letter-spacing: 0.05em;
-        text-transform: uppercase;
+      .admin-sub {
+        font-size: 0.72rem !important;
+        color: #9896a4 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.08em !important;
+        margin-top: 0.35rem !important;
+        display: block !important;
       }
 
-      /* ── Comment card ────────────────────────────────── */
-      .comment-card {
-        background: var(--card-bg);
-        border: 1px solid rgba(199,99,153,0.35);
-        border-left: 4px solid var(--accent);
-        border-radius: 14px;
-        padding: 1.5rem;
-        margin-bottom: 1.5rem;
-        transition: background 0.2s, box-shadow 0.2s;
-        animation: fadeIn 0.3s ease both;
-        box-shadow: 0 4px 24px rgba(0,0,0,0.5);
+      .count-pill {
+        display: inline-block !important;
+        background: rgba(199,99,153,0.15) !important;
+        border: 1px solid rgba(199,99,153,0.4) !important;
+        color: #c76399 !important;
+        font-size: 0.7rem !important;
+        padding: 0.1rem 0.55rem !important;
+        border-radius: 20px !important;
+        margin-left: 0.4rem !important;
+        vertical-align: middle !important;
       }
 
-      @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(8px); }
+      /* ── Grid ──────────────────────────── */
+      .cards-grid {
+        display: grid !important;
+        grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)) !important;
+        gap: 1.2rem !important;
+      }
+
+      /* ── Card ──────────────────────────── */
+      .card {
+        background: #171a3a !important;
+        border: 1px solid rgba(199,99,153,0.45) !important;
+        border-left: 4px solid #c76399 !important;
+        border-radius: 14px !important;
+        padding: 1.4rem !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 0.9rem !important;
+        animation: fadeUp 0.3s ease both !important;
+        transition: background 0.2s, transform 0.2s !important;
+      }
+
+      .card:hover {
+        background: #1e2248 !important;
+        transform: translateY(-2px) !important;
+      }
+
+      @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(10px); }
         to   { opacity: 1; transform: translateY(0); }
       }
 
-      .comment-card:hover { background: var(--card-hover); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,0.6); }
-
-      /* header row */
-      .card-header {
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        gap: 1rem;
-        margin-bottom: 1rem;
-        flex-wrap: wrap;
+      .card-top {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: flex-start !important;
+        gap: 0.8rem !important;
       }
 
-      .card-author-block { display: flex; flex-direction: column; gap: 0.25rem; }
+      .card-author { display: flex !important; flex-direction: column !important; gap: 0.2rem !important; }
 
       .card-name {
-        font-size: 1.05rem;
-        font-weight: 700;
-        color: var(--text);
+        font-size: 1rem !important;
+        font-weight: 700 !important;
+        color: #f2f0e9 !important;
+        display: block !important;
       }
 
       .card-website {
-        font-family: var(--font-mono);
-        font-size: 0.78rem;
-        color: var(--accent);
-        text-decoration: none;
-        letter-spacing: 0.02em;
+        font-size: 0.75rem !important;
+        color: #c76399 !important;
+        text-decoration: none !important;
+        display: block !important;
       }
 
-      .card-website:hover { text-decoration: underline; }
+      .card-website.no-site { color: #9896a4 !important; }
 
       .card-badges {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        gap: 0.3rem;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: flex-end !important;
+        gap: 0.3rem !important;
       }
 
-      .badge {
-        display: inline-block;
-        font-family: var(--font-mono);
-        font-size: 0.72rem;
-        letter-spacing: 0.05em;
-        padding: 0.2rem 0.6rem;
-        border-radius: 20px;
-        white-space: nowrap;
+      .pill {
+        display: inline-block !important;
+        font-size: 0.68rem !important;
+        padding: 0.18rem 0.55rem !important;
+        border-radius: 20px !important;
+        white-space: nowrap !important;
+        letter-spacing: 0.04em !important;
       }
 
-      .badge-slug {
-        background: rgba(134,124,192,0.15);
-        color: var(--purple);
-        border: 1px solid rgba(134,124,192,0.3);
+      .pill-slug {
+        background: rgba(134,124,192,0.18) !important;
+        color: #a89fe0 !important;
+        border: 1px solid rgba(134,124,192,0.3) !important;
       }
 
-      .badge-date {
-        background: rgba(255,255,255,0.05);
-        color: var(--text-muted);
-        border: 1px solid var(--border);
+      .pill-date {
+        background: rgba(255,255,255,0.05) !important;
+        color: #c9c6d1 !important;
+        border: 1px solid rgba(255,255,255,0.1) !important;
       }
 
-      /* labels */
-      .card-section-label {
-        font-family: var(--font-mono);
-        font-size: 0.7rem;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        color: var(--text-muted);
-        margin-bottom: 0.4rem;
+      .section-label {
+        font-size: 0.65rem !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.1em !important;
+        color: #9896a4 !important;
+        margin-bottom: 0.3rem !important;
+        display: block !important;
       }
 
-      /* comment body */
-      .card-body-wrap {
-        margin-bottom: 1.2rem;
+      .comment-body {
+        font-family: sans-serif !important;
+        font-size: 0.9rem !important;
+        line-height: 1.65 !important;
+        color: #f2f0e9 !important;
+        background: rgba(0,0,0,0.3) !important;
+        border-left: 3px solid #c76399 !important;
+        border-radius: 0 8px 8px 0 !important;
+        padding: 0.7rem 0.9rem !important;
+        white-space: pre-wrap !important;
+        word-break: break-word !important;
       }
 
-      .card-body {
-        font-size: 1rem;
-        line-height: 1.65;
-        color: var(--text);
-        background: rgba(0,0,0,0.2);
-        border-left: 3px solid var(--accent);
-        padding: 0.8rem 1rem;
-        border-radius: 0 8px 8px 0;
-        white-space: pre-wrap;
-        word-break: break-word;
+      .post-link {
+        display: inline-block !important;
+        font-size: 0.75rem !important;
+        color: #9896a4 !important;
+        border: 1px solid rgba(255,255,255,0.1) !important;
+        border-radius: 6px !important;
+        padding: 0.25rem 0.65rem !important;
+        text-decoration: none !important;
+        transition: color 0.15s, border-color 0.15s !important;
       }
 
-      /* post preview */
-      .card-post-wrap { margin-bottom: 1.2rem; }
+      .post-link:hover { color: #f2f0e9 !important; border-color: rgba(255,255,255,0.3) !important; }
 
-      .card-post-link {
-        font-family: var(--font-mono);
-        font-size: 0.82rem;
-        color: var(--text-muted);
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.3rem;
-        padding: 0.3rem 0.7rem;
-        border: 1px solid var(--border);
-        border-radius: 6px;
-        transition: color 0.15s, border-color 0.15s;
-      }
-
-      .card-post-link:hover { color: var(--text); border-color: var(--text-muted); }
-
-      /* actions row */
       .card-actions {
-        display: flex;
-        align-items: center;
-        gap: 0.7rem;
-        flex-wrap: wrap;
+        display: flex !important;
+        align-items: center !important;
+        gap: 0.6rem !important;
+        flex-wrap: wrap !important;
       }
 
       .card-status {
-        font-family: var(--font-mono);
-        font-size: 0.8rem;
-        margin-left: auto;
-        min-height: 1.4em;
+        font-size: 0.78rem !important;
+        margin-left: auto !important;
       }
 
-      .card-status.success { color: #4ade80; }
-      .card-status.error   { color: var(--red); }
+      .card-status.success { color: #4ade80 !important; }
+      .card-status.error   { color: #f87171 !important; }
 
-      /* ── States ──────────────────────────────────────── */
+      /* ── States ────────────────────────── */
       #loading, #empty-state {
-        text-align: center;
-        padding: 4rem 0;
-        color: var(--text-muted);
-        font-family: var(--font-mono);
-        font-size: 0.9rem;
-        letter-spacing: 0.04em;
-      }
-
-      .loading-dots::after {
-        content: '';
-        animation: dots 1.4s infinite;
-      }
-
-      @keyframes dots {
-        0%   { content: ''; }
-        33%  { content: '.'; }
-        66%  { content: '..'; }
-        100% { content: '...'; }
+        text-align: center !important;
+        padding: 4rem 0 !important;
+        color: #9896a4 !important;
+        font-size: 0.85rem !important;
+        letter-spacing: 0.04em !important;
       }
 
       .error-banner {
-        background: rgba(219,92,85,0.1);
-        border: 1px solid rgba(219,92,85,0.3);
-        color: #f87171;
-        padding: 1rem 1.2rem;
-        border-radius: 10px;
-        margin-bottom: 1.2rem;
-        font-family: var(--font-mono);
-        font-size: 0.85rem;
-      }
-
-      .count-badge {
-        display: inline-block;
-        background: rgba(199,99,153,0.15);
-        border: 1px solid rgba(199,99,153,0.3);
-        color: var(--accent);
-        font-family: var(--font-mono);
-        font-size: 0.75rem;
-        padding: 0.15rem 0.55rem;
-        border-radius: 20px;
-        margin-left: 0.5rem;
-        vertical-align: middle;
+        background: rgba(219,92,85,0.1) !important;
+        border: 1px solid rgba(219,92,85,0.35) !important;
+        color: #f87171 !important;
+        padding: 1rem 1.2rem !important;
+        border-radius: 10px !important;
+        margin-bottom: 1.2rem !important;
+        font-size: 0.82rem !important;
       }
     </style>
   </head>
   <body>
 
-    <!-- ── Login ────────────────────────────────────────── -->
+    <!-- Login -->
     <div id="login-screen">
       <div class="login-box">
         <div>
-          <p class="login-title">🌱 Garden of Thoughts</p>
-          <p class="login-subtitle">Admin · Comment Moderation</p>
+          <span class="login-title">🌱 Garden of Thoughts</span>
+          <span class="login-sub">Admin · Comment Moderation</span>
         </div>
         <div>
-          <label class="field-label" for="password-input">Password</label>
-          <input class="field-input" type="password" id="password-input" placeholder="Enter password" autocomplete="current-password" />
+          <label class="field-label" for="pw">Password</label>
+          <input class="field-input" type="password" id="pw" placeholder="Enter password" autocomplete="current-password" />
         </div>
-        <p class="login-error" id="login-error">Incorrect password. Try again.</p>
-        <button class="btn btn-primary" id="login-btn">Enter</button>
+        <p id="login-error" class="login-error">Incorrect password. Try again.</p>
+        <button class="btn btn-login" id="login-btn">Enter</button>
       </div>
     </div>
 
-    <!-- ── Admin ─────────────────────────────────────────── -->
+    <!-- Admin -->
     <div id="admin-screen">
       <div class="admin-header">
-        <h1 class="admin-title">Comment Moderation</h1>
-        <p class="admin-subtitle" id="admin-subtitle">Loading<span class="loading-dots"></span></p>
+        <span class="admin-title">Comment Moderation</span>
+        <span class="admin-sub" id="admin-sub">Loading...</span>
       </div>
-
       <div id="error-container"></div>
-      <div id="loading">
-        <span class="loading-dots">Fetching pending comments</span>
-      </div>
-      <div id="comments-container" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 1.2rem;"></div>
-      <div id="empty-state" style="display:none">
-        ✦ No pending comments — you're all caught up
-      </div>
+      <div id="loading">Fetching pending comments...</div>
+      <div class="cards-grid" id="cards-grid"></div>
+      <div id="empty-state" style="display:none">✦ No pending comments — you're all caught up</div>
     </div>
 
     <script>
       let sessionPassword = null;
+      let allSubmissions = [];
 
-      const loginScreen       = document.getElementById('login-screen');
-      const adminScreen       = document.getElementById('admin-screen');
-      const loginBtn          = document.getElementById('login-btn');
-      const passwordInput     = document.getElementById('password-input');
-      const loginError        = document.getElementById('login-error');
-      const commentsContainer = document.getElementById('comments-container');
-      const emptyState        = document.getElementById('empty-state');
-      const loadingEl         = document.getElementById('loading');
-      const errorContainer    = document.getElementById('error-container');
-      const adminSubtitle     = document.getElementById('admin-subtitle');
+      const loginScreen  = document.getElementById('login-screen');
+      const adminScreen  = document.getElementById('admin-screen');
+      const loginBtn     = document.getElementById('login-btn');
+      const pwInput      = document.getElementById('pw');
+      const loginError   = document.getElementById('login-error');
+      const cardsGrid    = document.getElementById('cards-grid');
+      const emptyState   = document.getElementById('empty-state');
+      const loadingEl    = document.getElementById('loading');
+      const adminSub     = document.getElementById('admin-sub');
+      const errorCont    = document.getElementById('error-container');
 
-      // ── Login ──────────────────────────────────────────
       loginBtn.addEventListener('click', handleLogin);
-      passwordInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') handleLogin();
-      });
+      pwInput.addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
 
       async function handleLogin() {
         loginBtn.disabled = true;
         loginBtn.textContent = 'Verifying...';
         loginError.style.display = 'none';
-
-        const password = passwordInput.value;
+        const password = pwInput.value;
         const res = await callAdmin({ action: 'list', password });
-
         if (res.error === 'Unauthorized') {
           loginError.style.display = 'block';
-          passwordInput.value = '';
+          pwInput.value = '';
           loginBtn.disabled = false;
           loginBtn.textContent = 'Enter';
           return;
         }
-
         sessionPassword = password;
         loginScreen.style.display = 'none';
         adminScreen.style.display = 'block';
-
-        const submissions = res.submissions || [];
+        allSubmissions = res.submissions || [];
         loadingEl.style.display = 'none';
-        adminSubtitle.innerHTML = submissions.length === 0
-          ? 'All caught up ✦'
-          : `<span>${submissions.length} pending</span><span class="count-badge">${submissions.length}</span>`;
-
-        renderSubmissions(submissions);
+        updateSubtitle();
+        renderCards();
       }
 
-      // ── API helpers ────────────────────────────────────
       async function callAdmin(body) {
         try {
-          const res = await fetch('/api/admin-submissions', {
+          const r = await fetch('/api/admin-submissions', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body),
           });
-          return res.json();
-        } catch (e) {
-          return { error: e.message };
-        }
+          return r.json();
+        } catch(e) { return { error: e.message }; }
       }
 
-      // ── Render ─────────────────────────────────────────
-      function renderSubmissions(submissions) {
-        commentsContainer.innerHTML = '';
+      function updateSubtitle() {
+        const n = allSubmissions.length;
+        adminSub.innerHTML = n === 0
+          ? 'All caught up ✦'
+          : `${n} pending <span class="count-pill">${n}</span>`;
+      }
 
-        if (submissions.length === 0) {
-          emptyState.style.display = 'block';
-          return;
-        }
+      function renderCards() {
+        cardsGrid.innerHTML = '';
+        if (allSubmissions.length === 0) { emptyState.style.display = 'block'; return; }
 
-        submissions.forEach((sub, i) => {
+        allSubmissions.forEach((sub, i) => {
           const { id, data, created_at } = sub;
           const { name, comment, slug, website } = data;
-
           const date = new Date(created_at).toLocaleDateString('en-US', {
-            year: 'numeric', month: 'short', day: 'numeric',
+            month: 'short', day: 'numeric', year: 'numeric',
             hour: '2-digit', minute: '2-digit'
           });
 
           const card = document.createElement('div');
-          card.className = 'comment-card';
+          card.className = 'card';
           card.id = `card-${id}`;
           card.style.animationDelay = `${i * 60}ms`;
 
           card.innerHTML = `
-            <div class="card-header">
-              <div class="card-author-block">
-                <span class="card-name">👤 ${escHtml(name)}</span>
+            <div class="card-top">
+              <div class="card-author">
+                <span class="card-name">👤 ${esc(name)}</span>
                 ${website
-                  ? `<a class="card-website" href="${escHtml(website)}" target="_blank" rel="noopener">⤤ ${escHtml(website)}</a>`
-                  : `<span class="card-website" style="color:var(--text-muted)">No website</span>`
-                }
+                  ? `<a class="card-website" href="${esc(website)}" target="_blank" rel="noopener">⤤ ${esc(website)}</a>`
+                  : `<span class="card-website no-site">No website</span>`}
               </div>
               <div class="card-badges">
-                <span class="badge badge-slug">📄 ${escHtml(slug)}</span>
-                <span class="badge badge-date">🕐 ${date}</span>
+                <span class="pill pill-slug">📄 ${esc(slug)}</span>
+                <span class="pill pill-date">🕐 ${date}</span>
               </div>
             </div>
 
-            <div class="card-body-wrap">
-              <p class="card-section-label">Comment</p>
-              <div class="card-body">${escHtml(comment)}</div>
+            <div>
+              <span class="section-label">Comment</span>
+              <div class="comment-body">${esc(comment)}</div>
             </div>
 
-            <div class="card-post-wrap">
-              <p class="card-section-label">Post</p>
-              <a class="card-post-link" href="/blog/${escHtml(slug)}" target="_blank" rel="noopener">
-                /blog/${escHtml(slug)} ↗
-              </a>
+            <div>
+              <span class="section-label">Post</span>
+              <a class="post-link" href="/blog/${esc(slug)}" target="_blank" rel="noopener">/blog/${esc(slug)} ↗</a>
             </div>
 
             <div class="card-actions">
@@ -504,82 +461,55 @@
               <span class="card-status" id="status-${id}"></span>
             </div>
           `;
-
-          commentsContainer.appendChild(card);
+          cardsGrid.appendChild(card);
         });
 
-        document.querySelectorAll('.btn-approve').forEach((btn) =>
-          btn.addEventListener('click', () => handleApprove(btn.dataset.id, submissions))
-        );
-        document.querySelectorAll('.btn-reject').forEach((btn) =>
-          btn.addEventListener('click', () => handleReject(btn.dataset.id))
-        );
+        document.querySelectorAll('.btn-approve').forEach(b =>
+          b.addEventListener('click', () => handleApprove(b.dataset.id)));
+        document.querySelectorAll('.btn-reject').forEach(b =>
+          b.addEventListener('click', () => handleReject(b.dataset.id)));
       }
 
-      // ── Approve ────────────────────────────────────────
-      async function handleApprove(submissionId, submissions) {
-        const sub = submissions.find((s) => s.id === submissionId);
-        setCardLoading(submissionId, true);
-        setStatus(submissionId, 'Pushing to GitHub...', '');
-
+      async function handleApprove(id) {
+        const sub = allSubmissions.find(s => s.id === id);
+        setLoading(id, true);
+        setStatus(id, 'Pushing to GitHub...', '');
         try {
-          const approveRes = await fetch('/api/comment-approved', {
+          const r = await fetch('/api/comment-approved', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ data: sub.data }),
           });
-          if (!approveRes.ok) throw new Error('GitHub push failed');
-
-          const deleteRes = await callAdmin({
-            action: 'delete',
-            password: sessionPassword,
-            submissionId,
-          });
-          if (deleteRes.error) throw new Error(deleteRes.error);
-
-          setStatus(submissionId, '✅ Approved & live soon!', 'success');
-          updateCount(-1);
-          setTimeout(() => removeCard(submissionId), 1800);
-        } catch (err) {
-          setStatus(submissionId, `Error: ${err.message}`, 'error');
-          setCardLoading(submissionId, false);
+          if (!r.ok) throw new Error('GitHub push failed');
+          const d = await callAdmin({ action: 'delete', password: sessionPassword, submissionId: id });
+          if (d.error) throw new Error(d.error);
+          setStatus(id, '✅ Approved & live soon!', 'success');
+          removeSubmission(id);
+          setTimeout(() => removeCard(id), 1800);
+        } catch(e) {
+          setStatus(id, `Error: ${e.message}`, 'error');
+          setLoading(id, false);
         }
       }
 
-      // ── Reject ─────────────────────────────────────────
-      async function handleReject(submissionId) {
-        setCardLoading(submissionId, true);
-        setStatus(submissionId, 'Deleting...', '');
-
+      async function handleReject(id) {
+        setLoading(id, true);
+        setStatus(id, 'Deleting...', '');
         try {
-          const res = await callAdmin({
-            action: 'delete',
-            password: sessionPassword,
-            submissionId,
-          });
-          if (res.error) throw new Error(res.error);
-
-          setStatus(submissionId, '❌ Rejected', 'error');
-          updateCount(-1);
-          setTimeout(() => removeCard(submissionId), 1200);
-        } catch (err) {
-          setStatus(submissionId, `Error: ${err.message}`, 'error');
-          setCardLoading(submissionId, false);
+          const d = await callAdmin({ action: 'delete', password: sessionPassword, submissionId: id });
+          if (d.error) throw new Error(d.error);
+          setStatus(id, '❌ Rejected', 'error');
+          removeSubmission(id);
+          setTimeout(() => removeCard(id), 1200);
+        } catch(e) {
+          setStatus(id, `Error: ${e.message}`, 'error');
+          setLoading(id, false);
         }
       }
 
-      // ── Helpers ────────────────────────────────────────
-      function setCardLoading(id, loading) {
-        document.getElementById(`card-${id}`)
-          ?.querySelectorAll('button')
-          .forEach((b) => (b.disabled = loading));
-      }
-
-      function setStatus(id, message, type) {
-        const el = document.getElementById(`status-${id}`);
-        if (!el) return;
-        el.textContent = message;
-        el.className = `card-status ${type}`;
+      function removeSubmission(id) {
+        allSubmissions = allSubmissions.filter(s => s.id !== id);
+        updateSubtitle();
       }
 
       function removeCard(id) {
@@ -587,30 +517,26 @@
         if (!card) return;
         card.style.transition = 'opacity 0.3s, transform 0.3s';
         card.style.opacity = '0';
-        card.style.transform = 'translateX(20px)';
+        card.style.transform = 'scale(0.96)';
         setTimeout(() => {
           card.remove();
-          if (commentsContainer.children.length === 0) {
-            emptyState.style.display = 'block';
-            adminSubtitle.innerHTML = 'All caught up ✦';
-          }
+          if (cardsGrid.children.length === 0) emptyState.style.display = 'block';
         }, 320);
       }
 
-      let pendingCount = 0;
-      function updateCount(delta) {
-        pendingCount = Math.max(0, pendingCount + delta);
-        if (pendingCount > 0) {
-          adminSubtitle.innerHTML = `<span>${pendingCount} pending</span><span class="count-badge">${pendingCount}</span>`;
-        }
+      function setLoading(id, v) {
+        document.getElementById(`card-${id}`)?.querySelectorAll('button').forEach(b => b.disabled = v);
       }
 
-      function escHtml(str) {
-        return String(str ?? '')
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/"/g, '&quot;');
+      function setStatus(id, msg, type) {
+        const el = document.getElementById(`status-${id}`);
+        if (el) { el.textContent = msg; el.className = `card-status ${type}`; }
+      }
+
+      function esc(s) {
+        return String(s ?? '')
+          .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+          .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
       }
     </script>
   </body>
