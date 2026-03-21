@@ -135,7 +135,7 @@
       /* ── Admin layout ────────────────────────────────── */
       #admin-screen {
         display: none;
-        max-width: 760px;
+        max-width: 1100px;
         margin: 0 auto;
         padding: 3rem 1.5rem 6rem;
       }
@@ -180,7 +180,7 @@
         to   { opacity: 1; transform: translateY(0); }
       }
 
-      .comment-card:hover { background: var(--card-hover); }
+      .comment-card:hover { background: var(--card-hover); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,0.6); }
 
       /* header row */
       .card-header {
@@ -379,7 +379,7 @@
       <div id="loading">
         <span class="loading-dots">Fetching pending comments</span>
       </div>
-      <div id="comments-container"></div>
+      <div id="comments-container" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 1.2rem;"></div>
       <div id="empty-state" style="display:none">
         ✦ No pending comments — you're all caught up
       </div>
