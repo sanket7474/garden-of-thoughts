@@ -1,11 +1,10 @@
 export default async (req) => {
-  const body = await req.text();
-  const params = new URLSearchParams(body);
+  const body = await req.json(); // ← was req.text()
 
-  const name = params.get('name');
-  const comment = params.get('comment');
-  const slug = params.get('slug');
-  const website = params.get('website') || 'none';
+  const name = body.data?.name;
+  const comment = body.data?.comment;
+  const slug = body.data?.slug;
+  const website = body.data?.website || 'none';
 
   const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL;
 
@@ -31,5 +30,3 @@ export default async (req) => {
 export const config = {
   path: '/api/comment-notify',
 };
-
-
