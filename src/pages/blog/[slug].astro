@@ -134,7 +134,7 @@ hr {
           <span class="meta-dot">·</span>
           <span class="article-minutes">⏱️ {minutesRead} min read</span>
           <span class="meta-dot">·</span>
-          <span class="article-views">👁️ {note.views || 0} views</span>
+          <span class="article-views" id="view-count">👁️ {note.views || 0} views</span>
           <hr>
         </div>
          <div class="prose">
@@ -163,5 +163,16 @@ hr {
       tag.style.color = shuffled[i % shuffled.length];
     });
   });
+
+  const slug = window.__slug || document.location.pathname.split('/blog/')[1]?.replace('/', '');
+  console.log('Current slug:', slug);
+  // Increment on visit
+  fetch(`/api/post-view?slug=${slug}`, { method: 'POST' })
+    .then(r => r.json())
+    .then(data => {
+      const el = document.getElementById('view-count');
+      if (el) el.textContent = `👁️ ${data.views} view${data.views === 1 ? '' : 's'}`;
+    });
+  
 </script>
 </html>
