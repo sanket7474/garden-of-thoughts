@@ -25,7 +25,7 @@ function enableOption(option:any) {
   window.localStorage.setItem(option, 'true');
   if (option === configurations.cursorTrails && !trailsScriptsInjected) {
     // No trails on small screens
-    // if (document.documentElement.clientWidth < 640) return;
+    if (document.documentElement.clientWidth < 640) return;
     var pixiScript = document.createElement('script');
     pixiScript.onload = function () {
       const trailsScript = document.createElement('script');
