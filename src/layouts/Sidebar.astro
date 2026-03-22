@@ -47,11 +47,14 @@ const { page } = Astro.props;
     line-height: 1.1;
     text-align: right;
     text-transform: uppercase;
-    font-weight: normal;
     transform: skew(-10deg) rotate(-10deg);
     display: flex;
     flex-direction: column;
     align-items: center;
+    font-family: "Cascadia Mono", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 800;
+    font-style: normal;
   }
 
   @media (min-width: 640px) {
@@ -252,7 +255,7 @@ const { page } = Astro.props;
   }
 
   .imgAnchor {
-    margin-bottom: 0% !important;
+    
     display: block;
     height: 10vh;
   }
@@ -261,7 +264,7 @@ const { page } = Astro.props;
     position: absolute;
     width: 70vw;
     left: -20vw;
-    top: 0;
+    top: -5%;
     display: block;
     z-index: 99999;
     transform: rotate(10deg) scale(1);
@@ -275,7 +278,7 @@ const { page } = Astro.props;
 
   @media (min-width: 640px) {
     .imgAnchor {
-      margin-bottom: 20% !important;
+      margin-bottom: 10vh !important;
       display: block;
       height: 30vh;
     }
@@ -284,6 +287,7 @@ const { page } = Astro.props;
       width: 25vw;
       left: -5vw;
       min-height: 100px;
+      top: 0;
     }
   }
 </style>
@@ -294,7 +298,7 @@ const { page } = Astro.props;
   </div>
   <a href="/" class="site-name-link"
     ><div class="site-name">
-      <span>Garden</span><span>Of</span><span>Thoughts</span>
+      <span>&nbspGarden&nbsp</span><span>&nbsp Of &nbsp</span><span>&nbspThoughts&nbsp</span>
     </div></a
   >
   <nav class="nav">
