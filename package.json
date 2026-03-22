@@ -9,9 +9,11 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/mdx": "^5.0.2",
     "@astrojs/sitemap": "^3.7.1",
     "@netlify/blobs": "^10.7.4",
     "astro": "^5.17.1",
+    "lite-youtube-embed": "^0.3.4",
     "rehype-external-links": "^3.0.0"
   }
 }

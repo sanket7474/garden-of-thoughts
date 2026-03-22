@@ -7,7 +7,10 @@ import { glob } from 'astro/loaders';
 // each post will have a title, date, tags, and an optional draft status
 // The schema ensures that each post has the required fields and validates their types
 const posts = defineCollection({
-  type: 'content',
+  loader: glob({
+    pattern: '**/*.{md,mdx}',  // ← picks up both
+    base: './src/content/posts',
+  }),
   // z is a schema validation library that Astro uses to define the shape of your content
   // it is called "zod" and allows you to specify the expected structure of 
   // your content entries

@@ -162,7 +162,7 @@ let page = 'tags';
                 {posts.map((post) => {
                   const date = new Date(post.data.date);
                   const day = date.getDate().toString().padStart(2, '0');
-                  const slug = post.id.replace('.md', '');
+                  const slug = post.id.replace('.md', '').replace(".mdx", "");
                   return (
                     <>
                       <div class="post-row" onclick={`window.location='/blog/${slug}'`}>

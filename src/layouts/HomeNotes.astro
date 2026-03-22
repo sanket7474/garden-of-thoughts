@@ -209,7 +209,7 @@ years.forEach(y => y.months.sort((a:any, b:any) => b.date - a.date));
             <div class="month-label"><span>{month.name}</span></div>
             <div class="divider-full"></div>
             {month.posts.map((post:any) => (
-              <div class="post-row" onclick={`window.location='/blog/${post.slug}'`}>
+              <div class="post-row" onclick={`window.location='/blog/${post.id}'`}>
                 <span class="post-day">{post.day}</span>
                 <span class="post-title">
                   {post.data.title}

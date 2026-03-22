@@ -4,6 +4,7 @@ import { getCollection, render } from "astro:content";
 import DocumentHead from "../../layouts/DocumentHead.astro";
 import Comments from "../../layouts/Comments.astro";
 import TagsList from "../../layouts/TagsList.astro";
+import YouTubeScript from "../../layouts/YouTubeScript.astro";
 
 const { slug } = Astro.params;
 const { note } = Astro.props;
@@ -11,10 +12,10 @@ const { note } = Astro.props;
 
 export async function getStaticPaths() {
   const notes = await getCollection("posts");
-  
+  console.log('oath : ' + notes.map(n => n.id));
   return [
     ...notes.map((note) => ({
-      params: { slug: note.id.replace(".md", "") },
+      params: { slug: note.id.replace(".md", "").replace(".mdx", "") },
       props: { note },
     })),
   ];
@@ -32,6 +33,8 @@ const {
 } = note;
 
 const { Content } = await render(note);
+
+const includeYTResources = note.body.includes('lite-youtube');
 
 const permalink = "https://sanketmaske.dev/${slug}/";
 
@@ -118,7 +121,7 @@ const titleEncoded = encodeURIComponent(`re: ${title}`);
 </style>
 
 <html lang="en">
-  <DocumentHead title={title} description="" permalink={permalink} />
+  <DocumentHead title={title} description="" permalink={permalink} includeYTResources={includeYTResources} />
   <body>
     <Layout page="note">
       <article class="article-wrap">
@@ -148,6 +151,7 @@ const titleEncoded = encodeURIComponent(`re: ${title}`);
       </section>
       <Comments slug={slug} noComments={noComments} />
     </Layout>
+    {includeYTResources && <YouTubeScript />}
   </body>
 
   <script>
