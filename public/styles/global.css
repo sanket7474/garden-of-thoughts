@@ -383,7 +383,7 @@
     }
 
     .tag {
-  font-family: var(--mono);
+  font-family: var(--font-mono);
   font-size: 1rem;
   letter-spacing: .04em;
   background: none;

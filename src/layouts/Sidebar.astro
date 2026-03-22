@@ -357,7 +357,7 @@ const { page } = Astro.props;
   });
 
   const img = new Image();
-  img.src = "/assets/images/peacock.png";
+  img.src = "/assets/images/peacock-compressed.png";
 
   img.onload = () => {
     const src = document.createElement("canvas");
@@ -415,7 +415,7 @@ const { page } = Astro.props;
 
     let t = 0;
     function frame() {
-      t += 0.016;
+      t += 0.050;
       const sd = srcData.data,
         od = out.data;
       for (let y = 0; y < SIZE; y++) {

@@ -52,6 +52,7 @@ years.forEach(y => y.months.sort((a:any, b:any) => b.date - a.date));
       line-height: 1;
       opacity: 0.5;
       user-select: none;
+      font-family: var(--mono);
     }
 
     .month-group {
@@ -112,7 +113,7 @@ years.forEach(y => y.months.sort((a:any, b:any) => b.date - a.date));
     }
 
     .post-day {
-      font-family: var(--mono);
+      font-family: var(--font-mono);
       font-size: 1.2rem;
       font-weight: 500;
       padding-top: 1px;
@@ -225,7 +226,7 @@ years.forEach(y => y.months.sort((a:any, b:any) => b.date - a.date));
                     // @ts-nocheck
                     // @ts-ignore
                   post.data.tags.map(tag => (
-                    <a href={`/tags/${tag}`} class="tag">#{tag}</a>
+                    <a href={`/tags/#${tag}`} class="tag">#{tag}</a>
                   ))}
                 </span>
                 
