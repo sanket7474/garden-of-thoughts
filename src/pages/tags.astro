@@ -1,20 +1,200 @@
 ---
-// Component Imports
 import DocumentHead from '../layouts/DocumentHead.astro';
 import Layout from '../layouts/Layout.astro';
-import AboutPage from '../layouts/AboutPage.astro';
+import { getCollection } from 'astro:content';
 
-let title = `About | Sanket Maske's digital garden`;
-let permalink = '';
+// @ts-nocheck
 
+const allPosts = await getCollection('posts', ({ data }) => !data.draft);
+
+// Build tag map: tag -> sorted posts
+const tagMap = {};
+allPosts.forEach(post => {
+  post.data.tags?.forEach(tag => {
+    if (!tagMap[tag]) tagMap[tag] = [];
+    tagMap[tag].push(post);
+  });
+});
+
+// Sort posts within each tag by date descending
+Object.values(tagMap).forEach(posts =>
+  posts.sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime())
+);
+
+// Sort tags by post count descending
+const tags = Object.entries(tagMap).sort((a, b) => b[1].length - a[1].length);
+
+const colors = ['--red', '--orange', '--pink', '--green', '--light-blue', '--purple', '--blue'];
+
+let title = `Tags | Sanket Maske's digital garden`;
+let permalink = 'https://sanketmaske.dev/tags';
 let page = 'tags';
 ---
 
 <html lang="en">
+  
   <DocumentHead title={title} description="" permalink={permalink} />
+  <style>
+
+ 
+  .tags-page {
+    padding: 28px 0 60px;
+  }
+
+  /* ── Top nav pills ── */
+  .tag-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    padding: 28px 0 1.5rem;
+  }
+
+  .tag-pill {
+    font-family: var(--mono);
+    font-size: 0.9rem;
+    color: var(--tag-color);
+    border: 1px solid var(--tag-color);
+    border-radius: 20px;
+    padding: 0.2rem 0.7rem;
+    text-decoration: none;
+    transition: background 0.15s;
+  }
+
+  .tag-pill:hover {
+    background: color-mix(in srgb, var(--tag-color) 12%, transparent);
+  }
+
+  /* ── Tag section heading ── */
+  .tag-section {
+    margin-top: 3rem;
+  }
+
+  .tag-heading {
+    display: block;
+    font-size: 2.5rem;
+    font-style: italic;
+    font-weight: 400;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    user-select: none;
+    opacity: 0.8;
+    font-family: var(--mono);
+  }
+
+  .tag-count {
+    display: block;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    color: var(--second-text-color);
+    margin: 0.4rem 0 1rem;
+  }
+
+  /* ── Post rows (same as HomeNotes) ── */
+  .month-group { margin-top: 0; }
+
+  .post-row::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    transform: scaleY(0);
+    transform-origin: center;
+    transition: transform 0.2s ease;
+    background: var(--second-text-color);
+  }
+
+  .post-row:hover::before { transform: scaleY(1); }
+
+  .post-day {
+    font-family: var(--mono);
+    font-size: 1.1rem;
+    font-weight: 500;
+    padding-top: 1px;
+    text-align: right;
+    padding-right: 18px;
+    user-select: none;
+  }
+
+  .tag:hover { opacity: 0.65; }
+
+  .divider {
+    height: 1px;
+    background: linear-gradient(to right, rgba(120, 130, 200, 0.4), transparent);
+    border: none;
+  }
+
+  .divider-full {
+    height: 5px;
+    background: rgba(120, 130, 200, 0.4);
+    border: none;
+  }
+</style>
   <body>
     <Layout page={page}>
-    
+      <div class="tags-page">
+
+        <!-- Tag anchor links at top -->
+        <div class="tag-nav">
+          {tags.map(([tag], i) => {
+            const color = colors[i % colors.length];
+            return (
+              <a href={`#${tag}`} class="tag-pill" style={`--tag-color: var(${color})`}>
+                #{tag}
+              </a>
+            );
+          })}
+        </div>
+
+        <div class="divider-full"></div>
+
+        <!-- Posts grouped by tag -->
+        {tags.map(([tag, posts], i) => {
+          const color = colors[i % colors.length];
+          return (
+            <div class="tag-section" id={tag}>
+              <span class="tag-heading" style={`color: var(${color})`}>#{tag}</span>
+              <span class="tag-count">{posts.length} {posts.length === 1 ? 'post' : 'posts'}</span>
+              <div class="divider-full"></div>
+              <div class="month-group">
+                {posts.map((post) => {
+                  const date = new Date(post.data.date);
+                  const day = date.getDate().toString().padStart(2, '0');
+                  const slug = post.id.replace('.md', '');
+                  return (
+                    <>
+                      <div class="post-row" onclick={`window.location='/blog/${slug}'`}>
+                        <span class="post-day" style={`color: var(${color})`}>{day}</span>
+                        <span class="post-title">
+                          {post.data.title}
+                          {post.data.tags.map(t => (
+                            <a href={`#${t}`} class="tag">#{t}</a>
+                          ))}
+                        </span>
+                      </div>
+                      <div class="divider"></div>
+                    </>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+
+      </div>
     </Layout>
   </body>
 </html>
+
+
+
+<script>
+  // @ts-nocheck
+  document.querySelectorAll('.post-title').forEach(title => {
+    const tags = title.querySelectorAll('.tag');
+    const colors = ['var(--red)', 'var(--orange)', 'var(--pink)', 'var(--green)', 'var(--light-blue)', 'var(--purple)', 'var(--blue)'];
+    const shuffled = colors.sort(() => Math.random() - 0.5);
+    tags.forEach((tag, i) => { tag.style.color = shuffled[i % shuffled.length]; });
+  });
+</script>
