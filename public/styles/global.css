@@ -162,10 +162,11 @@
       height: 100%;
       margin: 0px;
       padding: 0px;
+      font-family: var(--font-mono);
     }
 
     body {
-      font-family: sans-serif;
+      font-family: var(--font-mono);
       font-size: 1.2rem;
       line-height: 1.5;
       font-family: "Barlow", sans-serif;
