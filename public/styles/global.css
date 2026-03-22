@@ -94,6 +94,7 @@
     }
 
     :root {
+
       --sidebar-width: 260px;
       --font-secondary: Menlo, Consolas, Monaco, Liberation Mono, Lucida Console, monospace;
       --font-mono: "Cascadia Mono", sans-serif;
@@ -403,4 +404,40 @@
 
 .dark-mode .chckbx {
   cursor: url('/pointer-dark.svg') 0 0, pointer;
+}
+
+.dark-mode hr {
+  border: none;
+  height: 5px;
+  background: linear-gradient(to right, rgba(120,130,200,0.4), transparent);
+  margin: 1.5rem 0;
+}
+
+hr {
+  border: none;
+  height: 2px;
+  background: linear-gradient(to right, rgba(0,0,0,0.9), transparent);
+  margin: 1.5rem 0;
+}
+
+.dark-mode .divider {
+  height: 1px;
+  background: linear-gradient(to right, rgba(120, 130, 200, 0.4), transparent);
+  border: none;
+}
+ .dark-mode .divider-full {
+  height: 5px;
+  background: rgba(120, 130, 200, 0.4); 
+  border: none;
+}
+
+.divider {
+  height: 1px;
+  background: linear-gradient(to right, rgba(0,0,0,0.9), transparent);
+  border: none;
+}
+ .divider-full {
+  height: 5px;
+  background: rgba(0,0,0,0.8); 
+  border: none;
 }
