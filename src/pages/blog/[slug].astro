@@ -40,7 +40,7 @@ const titleEncoded = encodeURIComponent(`re: ${title}`);
 
 <style>
   h1 {
-    font-size: 3rem;
+    font-size: 3.5rem;
     margin-bottom: 0;
     line-height: 1;
   }
@@ -128,13 +128,14 @@ hr {
         <h1 class="article-h1">{title}</h1>
         
         <div class="article-meta">
-          <span class="article-date">📅{formatDate(date)}</span>
+          <span class="article-date">📅 {formatDate(date)}</span>
           <span class="meta-dot">·</span>
-          <TagsList tags={tags} />
-          <span class="meta-dot">·</span>
-          <span class="article-minutes">⏱️ {minutesRead} min read</span>
+          <span class="article-minutes">⌚ {minutesRead} mins read</span>
           <span class="meta-dot">·</span>
           <span class="article-views" id="view-count">👁️ {note.views || 0} views</span>
+          <div class="article-meta">
+            <TagsList tags={tags} />
+          </div>
           <hr>
         </div>
          <div class="prose">
@@ -165,7 +166,7 @@ hr {
   });
 
   const slug = window.__slug || document.location.pathname.split('/blog/')[1]?.replace('/', '');
-  console.log('Current slug:', slug);
+  
   // Increment on visit
   fetch(`/api/post-view?slug=${slug}`, { method: 'POST' })
     .then(r => r.json())
