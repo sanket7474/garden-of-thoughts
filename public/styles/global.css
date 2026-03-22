@@ -127,14 +127,14 @@
     }
 
     a.external::after {
-      content: url("/assets/external-arrow.svg");
+      content: url("/assets/images/external-arrow.svg");
       display: inline-block;
       background-size: 0 0;
       vertical-align: middle;
     }
 
     .dark-mode a.external::after {
-      content: url("/assets/external-arrow-white.svg");
+      content: url("/assets/images/external-arrow-white.svg");
     }
 
     a:hover {
@@ -347,3 +347,27 @@ hr {
   background: rgba(0,0,0,0.8); 
   border: none;
 }
+
+.styled-link-underlines a:not(.lty-playbtn) {
+      text-decoration: none;
+      background-repeat: no-repeat;
+      background-size: 100% 0.24em;
+      background-position: 0 114%;
+      background-image: linear-gradient(
+        45deg,
+        var(--accent-color),
+        var(--accent-color)
+      );
+    }
+
+    .styled-link-underlines a.external {
+      background-size: calc(100% - 15px) 0.24em;
+    }
+
+    .styled-link-underlines a:hover {
+      color: var(--accent-color);
+    }
+
+    .rainbows .styled-link-underlines a:not(.lty-playbtn) {
+      background-image: var(--gradient-color);
+    }
