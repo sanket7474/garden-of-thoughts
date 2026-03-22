@@ -32,7 +32,12 @@ let metaImage = ``;
 {
   canonicalUrl && (
     <>
-     
+     <link rel="canonical" href={canonicalUrl} />
+      <meta name="author" content="Sanket Maske" />
+      <meta property="og:type" content="article" />
+      <meta property="og:title" content={title} />
+      <meta property="og:description" content={description} />
+      <meta property="og:url" content={permalink} />
     </>
   )
 }
