@@ -30,7 +30,8 @@ export default async (req) => {
     return new Response('Missing env vars: GITHUB_TOKEN or GITHUB_REPO', { status: 500 });
   }
 
-  const filePath = `src/content/comments/${slug}.json`;
+  const normalizedSlug = slug.toLowerCase();
+  const filePath = `src/content/comments/${normalizedSlug}.json`;
   const apiUrl = `https://api.github.com/repos/${GITHUB_REPO}/contents/${filePath}`;
 
   const headers = {
@@ -69,7 +70,7 @@ export default async (req) => {
   const encoded = Buffer.from(fileContent, 'utf-8').toString('base64');
 
   const payload = {
-    message: `add comment on ${slug}`,
+    message: `add comment on ${normalizedSlug}`,
     content: encoded,
     branch: BRANCH,
     ...(fileSha && { sha: fileSha }),
