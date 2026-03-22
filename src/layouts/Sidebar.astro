@@ -56,8 +56,9 @@ const { page } = Astro.props;
 
   @media (min-width: 640px) {
     .site-name {
-      font-size: 1.5rem;
+      font-size: 2rem;
       margin-right: -20px;
+      
     }
   }
 
@@ -319,13 +320,13 @@ const { page } = Astro.props;
   </nav>
 
   <ul class="settings">
-    <li class="cursor-trails-setting">
+    <li class="cursor-trails-setting chckbx">
       <label for="cursor-trails">cursor trails</label><input
         id="cursor-trails"
         type="checkbox"
       />
     </li>
-    <li>
+    <li class="chckbx">
       <label for="dark-mode">dark mode</label><input
         id="dark-mode"
         type="checkbox"

@@ -346,7 +346,7 @@
       display: grid;
       grid-template-columns: 52px 1fr;
       padding: 12px 0;
-      border-bottom: 1px solid var(--border-color);
+      border-bottom: 1px solid black;
       cursor: pointer;
       position: relative;
       text-decoration: none;
@@ -397,4 +397,10 @@
   cursor: url('/pointer-dark.svg') 0 0, pointer;
 }
 
- 
+.chckbx {
+  cursor: url('/pointer.svg') 0 0, pointer;
+}
+
+.dark-mode .chckbx {
+  cursor: url('/pointer-dark.svg') 0 0, pointer;
+}
