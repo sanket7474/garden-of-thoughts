@@ -4,6 +4,7 @@ slug: post-3
 date: 2026-03-20
 tags: ['life']
 draft: false
+minutesRead: 1
 ---
 
 <p>When things are always around us <br>

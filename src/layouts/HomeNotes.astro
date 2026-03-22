@@ -61,7 +61,7 @@ years.forEach(y => y.months.sort((a:any, b:any) => b.date - a.date));
     .month-label {
       display: block;
       padding: 28px 0 10px;
-      border-bottom: 2px solid black;
+      /* border-bottom: 2px solid black; */
     }
 
     .month-label span {
@@ -190,6 +190,17 @@ years.forEach(y => y.months.sort((a:any, b:any) => b.date - a.date));
     .post-row:nth-of-type(7n + 0):hover .post-title {
       color: var(--blue);
     }
+
+    .divider {
+  height: 1px;
+  background: linear-gradient(to right, rgba(120, 130, 200, 0.4), transparent);
+  border: none;
+}
+ .divider-full {
+  height: 5px;
+  background: rgba(120, 130, 200, 0.4); 
+  border: none;
+}
   </style>
 
 <div class="post-list">
@@ -204,6 +215,7 @@ years.forEach(y => y.months.sort((a:any, b:any) => b.date - a.date));
         year.months.map(month => (
           <div class="month-group">
             <div class="month-label"><span>{month.name}</span></div>
+            <div class="divider-full"></div>
             {month.posts.map((post:any) => (
               <div class="post-row" onclick={`window.location='/blog/${post.slug}'`}>
                 <span class="post-day">{post.day}</span>
@@ -216,8 +228,11 @@ years.forEach(y => y.months.sort((a:any, b:any) => b.date - a.date));
                     <a href={`/tags/${tag}`} class="tag">#{tag}</a>
                   ))}
                 </span>
+                
               </div>
+              <div class="divider"></div>
             ))}
+            
           </div>
         ))}
       </>

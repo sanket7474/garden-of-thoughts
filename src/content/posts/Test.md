@@ -2,8 +2,9 @@
 title: Write about the future you wantdh djkfhgjdks
 date: 2026-03-14
 slug: Test
-tags: ['sdksh', 'delusion']
+tags: ['sdksh', 'delusion', 'dsdsds', 'dsds', 'dsds', 'dsds']
 draft: false
+minutesRead: 3
 ---
 
 This is the first post in my garden. Every big thing starts somewhere small.

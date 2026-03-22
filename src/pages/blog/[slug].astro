@@ -3,6 +3,7 @@ import Layout from "../../layouts/Layout.astro";
 import { getCollection, render } from "astro:content";
 import DocumentHead from "../../layouts/DocumentHead.astro";
 import Comments from "../../layouts/Comments.astro";
+import TagsList from "../../layouts/TagsList.astro";
 
 const { slug } = Astro.params;
 const { note } = Astro.props;
@@ -27,7 +28,7 @@ export function formatDate(date:any) {
   });
 }
 const {
-  data: { tags, title, noComments },
+  data: { tags, title, noComments, date, minutesRead},
 } = note;
 
 const { Content } = await render(note);
@@ -39,7 +40,7 @@ const titleEncoded = encodeURIComponent(`re: ${title}`);
 
 <style>
   h1 {
-    font-size: 2.5rem;
+    font-size: 3rem;
     margin-bottom: 0;
     line-height: 1;
   }
@@ -78,6 +79,7 @@ const titleEncoded = encodeURIComponent(`re: ${title}`);
   flex-wrap: wrap;
   gap: 2px 0;
   align-items: center;
+  
 }
 .prose {
 
@@ -100,7 +102,21 @@ const titleEncoded = encodeURIComponent(`re: ${title}`);
 .prose strong { font-weight: 500; }
 
 .article-meta {
-  margin-top: 1em;
+  font-size: 0.9em;
+  margin: 2em 0em;
+}
+.article-date {
+
+  text-transform: uppercase
+}
+.article-minutes {
+ 
+}
+hr {
+  border: none;
+  height: 5px;
+  background: linear-gradient(to right, rgba(120,130,200,0.4), transparent);
+  margin: 1.5rem 0;
 }
 </style>
 
@@ -112,15 +128,14 @@ const titleEncoded = encodeURIComponent(`re: ${title}`);
         <h1 class="article-h1">{title}</h1>
         
         <div class="article-meta">
-          <span class="article-date">25 feb 2026</span>
+          <span class="article-date">📅{formatDate(date)}</span>
           <span class="meta-dot">·</span>
-          <div class="tags-row">
-            <a href="#" class="tag">#life</a>
-            <a href="#" class="tag">#learning</a>
-            <a href="#" class="tag">#photography</a>
-            <a href="#" class="tag">#27</a>
-          </div>
-
+          <TagsList tags={tags} />
+          <span class="meta-dot">·</span>
+          <span class="article-minutes">⏱️ {minutesRead} min read</span>
+          <span class="meta-dot">·</span>
+          <span class="article-views">👁️ {note.views || 0} views</span>
+          <hr>
         </div>
          <div class="prose">
           <Content />
@@ -136,4 +151,17 @@ const titleEncoded = encodeURIComponent(`re: ${title}`);
       <Comments slug={slug} noComments={noComments} />
     </Layout>
   </body>
+
+  <script>
+  // @ts-nocheck
+     // @ts-ignore
+  document.querySelectorAll('.tags-row').forEach(title => {
+    const tags = title.querySelectorAll('.tag');
+    const colors = ['var(--red)', 'var(--orange)', 'var(--pink)', 'var(--green)', 'var(--light-blue)', 'var(--purple)', 'var(--blue)'];
+    const shuffled = colors.sort(() => Math.random() - 0.5);
+    tags.forEach((tag, i) => {
+      tag.style.color = shuffled[i % shuffled.length];
+    });
+  });
+</script>
 </html>

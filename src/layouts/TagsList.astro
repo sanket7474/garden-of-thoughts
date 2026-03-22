@@ -1,0 +1,32 @@
+---
+const { tags } = Astro.props;
+---
+
+{
+
+    <div class="tags-row">
+            {
+
+              tags.map((tag) => (
+                <a href={`/tags/${tag}`} class="tag">
+                  {'#'}{tag} 
+                </a>
+              ))
+            
+            }
+    </div>
+}
+
+<style>
+    /* tags-row wrapper */
+.tags-row {
+  display: inline-block;
+  flex-wrap: wrap;
+  gap: 2px 0;
+  align-items: center;
+  font-size: 0.9em;
+}
+a {
+    margin: 0 0.3rem;
+}
+</style>
