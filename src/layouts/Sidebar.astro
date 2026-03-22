@@ -276,17 +276,72 @@ const { page } = Astro.props;
     transform: rotate(10deg) scale(1.3);
   }
 
-  @media (min-width: 640px) {
+  @media only screen and (min-width: 600px) {
     .imgAnchor {
-      margin-bottom: 10vh !important;
       display: block;
-      height: 30vh;
+      height: 40vh;
+    }
+
+    .sidebar .imgAnchor .brandImg {
+      width: 40vw;
+      left: -5vw;
+      /* min-height: 100px; */
+      top: 0;
+    }
+  }
+
+  @media only screen and (min-width: 768px) {
+    .imgAnchor {
+      display: block;
+      height: 40vh;
+    }
+
+    .sidebar .imgAnchor .brandImg {
+      width: 40vw;
+      left: -5vw;
+      /* min-height: 100px; */
+      top: 0;
+    }
+  }
+
+  @media only screen and (min-width: 992px) {
+    .imgAnchor {
+      display: block;
+      height: 40vh;
     }
 
     .sidebar .imgAnchor .brandImg {
       width: 25vw;
       left: -5vw;
-      min-height: 100px;
+      /* min-height: 100px; */
+      top: 0;
+    }
+  }
+
+  @media only screen and (min-width: 1200px) {
+    .imgAnchor {
+      display: block;
+      height: 40vh;
+    }
+
+    .sidebar .imgAnchor .brandImg {
+      width: 25vw;
+      left: 0vw;
+      /* min-height: 100px; */
+      top: 0;
+    }
+  }
+
+  @media only screen and (min-width: 1600px) {
+    .imgAnchor {
+      display: block;
+      height: 40vh;
+    }
+
+    .sidebar .imgAnchor .brandImg {
+      width: 25vw;
+      left: -5vw;
+      /* min-height: 100px; */
       top: 0;
     }
   }
