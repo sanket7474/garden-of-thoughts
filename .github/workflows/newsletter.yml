@@ -12,7 +12,7 @@ on:
 jobs:
   send-newsletter:
     runs-on: ubuntu-latest
-
+    environment: secrets
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
