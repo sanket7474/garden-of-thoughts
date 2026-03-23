@@ -6,9 +6,21 @@ exports.handler = async (event) => {
 
     const resend = new Resend(process.env.RESEND_API_KEY);
 
+    // Save to Resend
     const response = await resend.contacts.create({
-      email: email,
-     audienceId: process.env.RESEND_AUDIENCE_ID,
+      email,
+      audienceId: process.env.RESEND_AUDIENCE_ID,
+    });
+
+    // 🔥 Send Discord notification
+    await fetch(process.env.DISCORD_WEBHOOK_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        content: `📬 New subscriber: **${email}**`,
+      }),
     });
 
     return {
