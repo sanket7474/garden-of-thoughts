@@ -59,13 +59,52 @@ const { page } = Astro.props;
 </div>
 
 <script>
+  const ENABLE_TRACKING = true;
+
+  function getDevice() {
+    return /Mobi|Android/i.test(navigator.userAgent)
+      ? "📱 Mobile"
+      : "💻 Desktop";
+  }
+
+  function getBrowser() {
+    const ua = navigator.userAgent;
+
+    if (ua.includes("Chrome") && !ua.includes("Edg")) return "🌐 Chrome";
+    if (ua.includes("Safari") && !ua.includes("Chrome")) return "🌐 Safari";
+    if (ua.includes("Firefox")) return "🌐 Firefox";
+    if (ua.includes("Edg")) return "🌐 Edge";
+
+    return "🌐 Unknown";
+  }
+
+  function getReferrer() {
+    if (!document.referrer) return "Direct";
+
+    try {
+      const url = new URL(document.referrer);
+      return url.hostname;
+    } catch {
+      return document.referrer;
+    }
+  }
+
   const path = window.location.pathname;
-  const ENABLE_TRACKING = true; 
-  // Only trigger for blog posts
+
   if (ENABLE_TRACKING) {
+    const returning = localStorage.getItem("visited") === "true";
+    localStorage.setItem("visited", "true");
+
     navigator.sendBeacon(
       "/.netlify/functions/page-hit",
-      JSON.stringify({ path })
+      JSON.stringify({
+        path,
+        device: getDevice(),
+        browser: getBrowser(),
+        referrer: getReferrer(),
+        userAgent: navigator.userAgent,
+        returning
+      })
     );
   }
 </script>
