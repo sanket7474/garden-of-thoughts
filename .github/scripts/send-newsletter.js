@@ -6,7 +6,6 @@ import https from 'https';
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const RESEND_AUDIENCE_ID = process.env.RESEND_AUDIENCE_ID;
 
-console.log('keys:: '+ RESEND_API_KEY + " ::: " + RESEND_AUDIENCE_ID)
 
 const POST_TITLE = process.env.POST_TITLE;
 const POST_SLUG = process.env.POST_SLUG;
@@ -21,7 +20,7 @@ async function fetchSubscribers() {
       Authorization: `Bearer ${RESEND_API_KEY}`,
     }
   );
-console.log("dataa ::: " + JSON.stringify(data, null, 2));
+
 
   if (!data || !data.data) {
     console.log("No contacts found in audience");
