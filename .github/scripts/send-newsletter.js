@@ -21,6 +21,7 @@ async function fetchSubscribers() {
       Authorization: `Bearer ${RESEND_API_KEY}`,
     }
   );
+console.log("dataa ::: " + JSON.stringify(data, null, 2));
 
   if (!data || !data.data) {
     console.log("No contacts found in audience");
