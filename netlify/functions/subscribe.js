@@ -4,7 +4,7 @@ exports.handler = async (event) => {
   try {
     const { email } = JSON.parse(event.body);
 
-    const resend = new Resend(process.env.RESEND_API_KEY);
+    const resend = new Resend('invlaid key');
 
     const response = await resend.contacts.create({
       email: email
