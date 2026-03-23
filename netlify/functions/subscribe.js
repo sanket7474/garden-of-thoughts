@@ -7,7 +7,7 @@ exports.handler = async (event) => {
     const resend = new Resend(process.env.RESEND_API_KEY);
 
     const response = await resend.contacts.create({
-      email: email,
+      email: email
     });
 
     return {
