@@ -1,7 +1,7 @@
 // .github/workflows/ — this is a GitHub Actions script, not a Netlify function
 // This file goes in: .github/scripts/send-newsletter.js
 
-const https = require('https');
+import https from 'https';
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const NETLIFY_API_TOKEN = process.env.NETLIFY_API_TOKEN;
