@@ -275,24 +275,37 @@ let page = "subscribe";
 </style>
 
 <script>
-  // @ts-nocheck
   const form = document.querySelector("#subscribe-form");
+
   form?.addEventListener("submit", async (e) => {
     e.preventDefault();
+
     const btn = form.querySelector("button");
     btn.disabled = true;
     btn.textContent = "Subscribing...";
 
     const formData = new FormData(form);
+
     try {
-      await fetch("/.netlify/functions/subscribe", {
+      const res = await fetch("/.netlify/functions/subscribe", {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams(formData.entries()).toString(),
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          email: formData.get("email")
+        }),
       });
+
+      const data = await res.json();
+      console.log("Response:", data);
+
       form.style.display = "none";
       document.querySelector("#subscribe-success").style.display = "block";
-    } catch {
+
+    } catch (err) {
+      console.error(err);
+
       document.querySelector("#subscribe-error").style.display = "block";
       btn.disabled = false;
       btn.textContent = "Subscribe →";
