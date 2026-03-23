@@ -102,6 +102,7 @@ const { page } = Astro.props;
     padding: 0;
     display: flex;
     justify-content: flex-end;
+    flex-wrap: wrap;
   }
 
   @media (min-width: 640px) {
@@ -118,7 +119,7 @@ const { page } = Astro.props;
   .nav li {
     text-transform: uppercase;
     margin-bottom: 0.4em;
-    padding-left: 1em;
+    padding-left: 0.8em;
   }
 
   .nav li a {
@@ -375,6 +376,9 @@ const { page } = Astro.props;
           href="/about/">About</a
         >
       </li>
+      <li>
+  <a class:list={{ active: page === 'subscribe', 'nav-link': true }} href="/subscribe">Subscribe</a>
+</li>
     </ul>
   </nav>
 

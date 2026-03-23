@@ -1,0 +1,301 @@
+---
+import DocumentHead from "../layouts/DocumentHead.astro";
+import Layout from "../layouts/Layout.astro";
+
+let title = `Subscribe | Sanket Maske's digital garden`;
+let permalink = "https://sanketmaske.dev/subscribe";
+let page = "subscribe";
+---
+
+<html lang="en">
+  <DocumentHead
+    title={title}
+    description="Subscribe to Garden of Thoughts"
+    permalink={permalink}
+  />
+  <body>
+    <Layout page={page}>
+      <div class="subscribe-page">
+        <span class="page-title">Subscribe</span>
+        <span class="page-sub"
+          >Get notified when I publish something new. No spam, just writing.</span
+        >
+        <div class="divider-full"></div>
+
+        <div class="subscribe-content">
+          <p class="subscribe-desc">
+            Interesting choice!!! <br> This usually means one of two things:<br>
+            either you genuinely like what I write, 
+            <br>or you clicked the button without thinking too much. 
+            <br>I'm choosing to believe it's the first.
+            <br><br>
+            I'll appear in your inbox when I actually have something to say. 
+            Could be next week. Could be next month. Could be whenever I run out of reasons to delay it.
+            <br><br>
+            Life is full of hard choices. This isn't one of them.
+            Enter your email, hit subscribe. Wish all life choices were this simple.
+          </p>
+
+          <div
+            id="subscribe-success"
+            class="subscribe-feedback success"
+            style="display:none"
+          >
+            <p>✅ You're in! I'll bother you only when I actually write something. (Rare but meaningful.)</p>
+            <p>Welcome to the very small, very exclusive group of people who 
+            voluntarily asked to hear from me. Respect.</p>
+          </div>
+
+          <p
+            id="subscribe-error"
+            class="subscribe-feedback error"
+            style="display:none"
+          >
+          ❌ Something broke. Either my code or the universe. Try again or just email me like a normal human.
+          </p>
+
+          <form
+            name="newsletter"
+            method="POST"
+            data-netlify="true"
+            id="subscribe-form"
+            netlify-honeypot="bot-field"
+          >
+            <p style="display:none"><input name="bot-field" /></p>
+
+            <div class="field-group">
+              <label class="field-label" for="email">Your email</label>
+              <div class="field-row">
+                <input
+                  type="email"
+                  name="email"
+                  id="email"
+                  placeholder="your@email.com"
+                  required
+                  class="field-input"
+                />
+                <button type="submit" class="subscribe-btn">Subscribe →</button>
+              </div>
+            </div>
+          </form>
+
+          <div class="divider"></div>
+
+          <div class="subscribe-notes">
+            <p class="note-item">
+              📬 You'll get an email when a new post is published
+            </p>
+            <p class="note-item">
+              🚫 No weekly digests, no promotions, no noise
+            </p>
+            <p class="note-item">
+              ✉️ To unsubscribe, just reply with "unsubscribe". No hard feelings. Genuinely.
+            </p>
+          </div>
+        </div>
+      </div>
+    </Layout>
+  </body>
+</html>
+
+<style>
+  .subscribe-page {
+    padding: 28px 0 60px;
+  }
+
+  .page-title {
+    display: block;
+    font-size: 2.5rem;
+    font-weight: 400;
+    color: var(--text-color);
+    letter-spacing: -0.03em;
+    padding: 44px 0 0;
+    line-height: 1;
+    user-select: none;
+  }
+
+  .page-sub {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 1.1rem;
+    color: var(--text-color);
+    margin: 0.6rem 0 1.5rem;
+  }
+
+  .divider-full {
+    height: 5px;
+    background: rgba(120, 130, 200, 0.4);
+    border: none;
+    margin-bottom: 2rem;
+  }
+
+  .divider {
+    height: 1px;
+    background: linear-gradient(
+      to right,
+      rgba(120, 130, 200, 0.4),
+      transparent
+    );
+    border: none;
+    margin: 2rem 0;
+  }
+
+  .subscribe-content {
+    max-width: 520px;
+  }
+
+  .subscribe-desc {
+    font-size: 0.9rem;
+    color: var(--text-color);
+    margin-bottom: 2rem;
+  }
+
+  @media (min-width: 640px) {
+    .subscribe-desc {
+      font-size: 1.2rem;
+      color: var(--text-color);
+      margin-bottom: 2rem;
+    }
+  }
+
+  .field-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .field-label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-color);
+    margin-bottom: 0.5rem;
+  }
+
+  .field-row {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+.field-input {
+  flex: 1;
+  min-width: 200px;
+  padding: 0.65rem 1rem;
+  font-size: 1rem;
+  font-family: var(--font-mono);
+  border: 2px solid rgba(120, 130, 200, 0.3);
+  border-radius: 8px;
+  color: var(--text-color);
+  outline: none;
+  transition: all 0.2s;
+}
+
+.field-input:focus {
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background: linear-gradient(var(--bg-color), var(--bg-color)) padding-box,
+    linear-gradient(90deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #00e8f0, #245cf7, #7a00ff, #ff00c8, #ff0000) border-box;
+  background-size: auto, 400% 100%;
+  animation: rainbowBorder 3s linear infinite;
+}
+
+@keyframes rainbowBorder {
+  0% { background-position: 0% 0%, 0% 50%; }
+  100% { background-position: 0% 0%, 400% 50%; }
+}
+
+:global(.dark-mode) .field-input {
+  border: 2px solid rgba(120, 130, 200, 0.3);
+}
+  :global(.dark-mode) .field-input {
+    background: rgba(0, 0, 0, 0.2);
+  }
+
+  :global(.dark-mode) .field-input:focus {
+    background-image: linear-gradient(var(--bg-color), var(--bg-color)),
+      linear-gradient(90deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #00e8f0, #245cf7, #7a00ff, #ff00c8, #ff0000);
+  }
+
+  .subscribe-btn {
+    padding: 0.65rem 1.4rem;
+    font-size: 1rem;
+    font-family: var(--font-mono);
+    font-weight: 600;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    white-space: nowrap;
+    cursor: pointer;
+    background: linear-gradient(
+      90deg,
+      #ff0000, #ff7300, #fffb00, #48ff00,
+      #00ffd5, #00e8f0, #245cf7, #7a00ff,
+      #ff00c8, #ff0000
+    );
+    background-size: 400% 100%;
+    animation: smoothRainbow 20s linear infinite;
+    transition: transform 0.15s;
+  }
+
+  .subscribe-btn:hover {
+    transform: scale(1.05);
+  }
+
+  @keyframes smoothRainbow {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 400% 50%; }
+  }
+
+  .subscribe-feedback {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    margin-bottom: 1.2rem;
+    line-height: 1.6;
+  }
+
+  .subscribe-feedback.success {
+    color: var(--green);
+  }
+
+  .subscribe-feedback.error {
+    color: var(--red);
+  }
+
+  .subscribe-notes {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .note-item {
+    font-family: var(--font-mono);
+    font-size: 1.1rem;
+    color: var(--text-color);
+  }
+</style>
+
+<script>
+  // @ts-nocheck
+  const form = document.querySelector("#subscribe-form");
+  form?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const btn = form.querySelector("button");
+    btn.disabled = true;
+    btn.textContent = "Subscribing...";
+
+    const formData = new FormData(form);
+    try {
+      await fetch("/", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams(formData.entries()).toString(),
+      });
+      form.style.display = "none";
+      document.querySelector("#subscribe-success").style.display = "block";
+    } catch {
+      document.querySelector("#subscribe-error").style.display = "block";
+      btn.disabled = false;
+      btn.textContent = "Subscribe →";
+    }
+  });
+</script>

@@ -1,0 +1,60 @@
+# .github/workflows/newsletter.yml
+name: Send Newsletter
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/content/posts/**.mdx'
+      - 'src/content/posts/**.md'
+
+jobs:
+  send-newsletter:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Get new post files
+        id: new-posts
+        run: |
+          # Get files added in this commit
+          NEW_FILES=$(git diff --name-only --diff-filter=A HEAD~1 HEAD -- 'src/content/posts/*.mdx' 'src/content/posts/*.md' 2>/dev/null || echo "")
+          echo "new_files=$NEW_FILES" >> $GITHUB_OUTPUT
+          echo "New post files: $NEW_FILES"
+
+      - name: Setup Node
+        if: steps.new-posts.outputs.new_files != ''
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Extract post metadata and send newsletter
+        if: steps.new-posts.outputs.new_files != ''
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          NETLIFY_API_TOKEN: ${{ secrets.NETLIFY_API_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        run: |
+          for FILE in ${{ steps.new-posts.outputs.new_files }}; do
+            echo "Processing: $FILE"
+
+            # Extract title from frontmatter
+            TITLE=$(grep '^title:' "$FILE" | head -1 | sed "s/^title: *['\"]*//" | sed "s/['\"] *$//")
+
+            # Extract slug from filename
+            SLUG=$(basename "$FILE" | sed 's/\.mdx\?$//')
+
+            # Extract first paragraph as excerpt (skip frontmatter)
+            EXCERPT=$(awk '/^---/{p++; next} p==2{if(NF>0){print; exit}}' "$FILE")
+
+            echo "Title: $TITLE"
+            echo "Slug: $SLUG"
+            echo "Excerpt: $EXCERPT"
+
+            POST_TITLE="$TITLE" POST_SLUG="$SLUG" POST_EXCERPT="$EXCERPT" node .github/scripts/send-newsletter.js
+          done
