@@ -193,7 +193,7 @@ let page = "subscribe";
 .field-input:focus {
   border: 2px solid transparent;
   border-radius: 8px;
-  background: linear-gradient(var(--bg-color), var(--bg-color)) padding-box,
+  background: linear-gradient(var(--background-color), var(--background-color)) padding-box,
     linear-gradient(90deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #00e8f0, #245cf7, #7a00ff, #ff00c8, #ff0000) border-box;
   background-size: auto, 400% 100%;
   animation: rainbowBorder 3s linear infinite;
@@ -212,7 +212,7 @@ let page = "subscribe";
   }
 
   :global(.dark-mode) .field-input:focus {
-    background-image: linear-gradient(var(--bg-color), var(--bg-color)),
+    background-image: linear-gradient(var(--background-color), var(--background-color)),
       linear-gradient(90deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #00e8f0, #245cf7, #7a00ff, #ff00c8, #ff0000);
   }
 
@@ -285,7 +285,7 @@ let page = "subscribe";
 
     const formData = new FormData(form);
     try {
-      await fetch("/", {
+      await fetch("/.netlify/functions/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: new URLSearchParams(formData.entries()).toString(),
