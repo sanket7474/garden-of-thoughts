@@ -3,8 +3,9 @@ const { slug, noComments } = Astro.props;
 import { getEntry } from 'astro:content';
 import CommentsList from './CommentsList.astro';
 
+console.log('Coooom ' + slug)
 const commentsEntry = await getEntry('comments', slug.toLowerCase());
-
+console.log(commentsEntry)
 const comments = commentsEntry?.data?.comments || [];
 ---
 
