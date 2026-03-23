@@ -13,7 +13,7 @@ exports.handler = async (event) => {
     });
 
     // 🔥 Send Discord notification
-    await fetch(process.env.DISCORD_WEBHOOK_URL, {
+    await fetch(process.env.DISCORD_WEBHOOK_URL_SUBSCRIBE, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -77,7 +77,7 @@ exports.handler = async (event) => {
       ]
     };
 
-    await fetch(process.env.DISCORD_WEBHOOK_URL, {
+    await fetch(process.env.DISCORD_WEBHOOK_URL_PAGE_HIT, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
