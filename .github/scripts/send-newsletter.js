@@ -4,8 +4,9 @@
 import https from 'https';
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const NETLIFY_API_TOKEN = process.env.NETLIFY_API_TOKEN;
-const NETLIFY_SITE_ID = process.env.NETLIFY_SITE_ID;
+const RESEND_AUDIENCE_ID = process.env.RESEND_AUDIENCE_ID;
+
+console.log('keys:: '+ RESEND_API_KEY + " ::: " + RESEND_AUDIENCE_ID)
 
 const POST_TITLE = process.env.POST_TITLE;
 const POST_SLUG = process.env.POST_SLUG;
@@ -15,7 +16,7 @@ const SITE_URL = 'https://sanketmaske.dev';
 async function fetchSubscribers() {
   const data = await apiRequest(
     'api.resend.com',
-    `/audiences/${process.env.RESEND_AUDIENCE_ID}/contacts`,
+    `/audiences/${RESEND_AUDIENCE_ID}/contacts`,
     {
       Authorization: `Bearer ${RESEND_API_KEY}`,
     }
