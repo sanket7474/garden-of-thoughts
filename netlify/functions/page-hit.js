@@ -1,5 +1,7 @@
 const WHITELIST = [
-  "85e7305b-9849-4a6b-8b84-1fa63bfa874f"
+  "85e7305b-9849-4a6b-8b84-1fa63bfa874f",
+  "07e218ee-de4b-45b4-8eaa-d5a435aff06a",
+  "30ef60ad-98b8-4660-b8eb-b8d89aa9ee9b"
 ];
 
 exports.handler = async (event) => {
