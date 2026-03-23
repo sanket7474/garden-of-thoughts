@@ -13,26 +13,20 @@ const POST_EXCERPT = process.env.POST_EXCERPT || '';
 const SITE_URL = 'https://sanketmaske.dev';
 
 async function fetchSubscribers() {
-  // Get newsletter form ID
-  const forms = await apiRequest(
-    'api.netlify.com',
-    `/api/v1/sites/${NETLIFY_SITE_ID}/forms`,
-    { Authorization: `Bearer ${NETLIFY_API_TOKEN}` }
+  const data = await apiRequest(
+    'api.resend.com',
+    `/audiences/${process.env.RESEND_AUDIENCE_ID}/contacts`,
+    {
+      Authorization: `Bearer ${RESEND_API_KEY}`,
+    }
   );
 
-  const newsletterForm = forms.find(f => f.name === 'newsletter');
-  if (!newsletterForm) {
-    console.log('No newsletter form found');
+  if (!data || !data.data) {
+    console.log("No contacts found in audience");
     return [];
   }
 
-  const submissions = await apiRequest(
-    'api.netlify.com',
-    `/api/v1/forms/${newsletterForm.id}/submissions`,
-    { Authorization: `Bearer ${NETLIFY_API_TOKEN}` }
-  );
-
-  return submissions.map(s => s.data.email).filter(Boolean);
+  return data.data.map(c => c.email).filter(Boolean);
 }
 
 async function sendEmail(to, subject, html) {
