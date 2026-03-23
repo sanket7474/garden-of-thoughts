@@ -104,7 +104,11 @@ const { page } = Astro.props;
     justify-content: flex-end;
     flex-wrap: wrap;
   }
-
+  .nav ul li:last-child {
+    flex-basis: 100%;
+    text-align: right;
+  }
+  
   @media (min-width: 640px) {
     .nav {
       font-size: 1.2rem;
