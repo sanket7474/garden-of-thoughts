@@ -15,7 +15,7 @@ const SITE_URL = 'https://sanketmaske.dev';
 async function fetchSubscribers() {
   const data = await apiRequest(
     'api.resend.com',
-    `/audiences/${process.env.RESEND_AUDIENCE_ID}/contacts`,
+    `/audiences/contacts`,
     {
       Authorization: `Bearer ${RESEND_API_KEY}`,
     }
