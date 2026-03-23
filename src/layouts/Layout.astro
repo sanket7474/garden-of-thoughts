@@ -62,7 +62,7 @@ const { page } = Astro.props;
   const path = window.location.pathname;
   const ENABLE_TRACKING = true; 
   // Only trigger for blog posts
-  if (ENABLE_TRACKING && ( path.startsWith("/blog/") || path.startsWith("/about") || path.startsWith("/subscribe"))) {
+  if (ENABLE_TRACKING) {
     navigator.sendBeacon(
       "/.netlify/functions/page-hit",
       JSON.stringify({ path })
