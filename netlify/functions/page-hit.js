@@ -1,26 +1,35 @@
+const WHITELIST = [
+  
+];
+
 exports.handler = async (event) => {
   try {
     const body = JSON.parse(event.body || "{}");
 
-    const path = body.path || "/";
-    const device = body.device || "Unknown";
-    const browser = body.browser || "Unknown";
-    const referrer = body.referrer || "Direct";
-    const userAgent = body.userAgent || "Unknown";
-    const returning = body.returning;
+    const {
+      path,
+      device,
+      browser,
+      referrer,
+      userAgent,
+      returning,
+      deviceId
+    } = body;
+
+    // 🔥 Ignore your own devices
+    if (WHITELIST.includes(deviceId)) {
+      return {
+        statusCode: 200,
+        body: "ignored"
+      };
+    }
 
     const url = `https://sanketmaske.dev${path}`;
 
-    // 🔥 Clean user agent (short version)
-    function shortenUA(ua) {
-      return ua.includes(")")
-        ? ua.split(")")[0] + ")"
-        : ua;
-    }
+    const cleanUA = userAgent.includes(")")
+      ? userAgent.split(")")[0] + ")"
+      : userAgent;
 
-    const cleanUA = shortenUA(userAgent);
-
-    // 🔥 Pretty page name
     const prettyName =
       path === "/"
         ? "Home"
@@ -30,62 +39,42 @@ exports.handler = async (event) => {
             .trim()
             .replace(/\b\w/g, (c) => c.toUpperCase());
 
-    // 🌍 Country (Netlify / Cloudflare header)
     const country =
       event.headers["x-country"] ||
       event.headers["cf-ipcountry"] ||
       "Unknown";
 
-    // 🔥 Final embed payload (clean format)
     const payload = {
       embeds: [
         {
-          author: {
-            name: "🌱 Garden of Thoughts"
-          },
           title: "👀 Page Visit",
           url: url,
           description: `User visited **${prettyName}**`,
           color: 5793266,
 
           fields: [
-            {
-              name: "📍 Path",
-              value: path,
-              inline: false
-            },
+            { name: "📍 Path", value: path },
             {
               name: "📊 Info",
-              value: `${device} | ${browser} | 🌍 ${country}`,
-              inline: false
+              value: `${device} | ${browser} | 🌍 ${country}`
             },
-            {
-              name: "🔗 Referrer",
-              value: referrer || "Direct",
-              inline: false
-            },
+            { name: "🔗 Referrer", value: referrer || "Direct" },
             {
               name: "👤 Visitor",
               value: returning ? "🔁 Returning" : "🆕 New",
               inline: true
             },
-            {
-              name: "🧠 User Agent",
-              value: cleanUA,
-              inline: false
-            }
+            { name: "🧠 User Agent", value: cleanUA }
           ],
 
           footer: {
-            text: "Live traffic • Garden of Thoughts"
+            text: "Live traffic"
           },
 
           timestamp: new Date().toISOString()
         }
       ]
     };
-
-    console.log("Sending to Discord:", JSON.stringify(payload, null, 2));
 
     await fetch(process.env.DISCORD_WEBHOOK_URL, {
       method: "POST",
@@ -95,15 +84,9 @@ exports.handler = async (event) => {
       body: JSON.stringify(payload)
     });
 
-    return {
-      statusCode: 200,
-      body: "ok"
-    };
+    return { statusCode: 200, body: "ok" };
   } catch (err) {
-    console.error("Tracking error:", err);
-    return {
-      statusCode: 500,
-      body: "error"
-    };
+    console.error(err);
+    return { statusCode: 500 };
   }
 };
