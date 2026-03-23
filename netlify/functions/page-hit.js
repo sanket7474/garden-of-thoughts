@@ -64,7 +64,8 @@ exports.handler = async (event) => {
               value: returning ? "🔁 Returning" : "🆕 New",
               inline: true
             },
-            { name: "🧠 User Agent", value: cleanUA }
+            { name: "🧠 User Agent", value: cleanUA },
+            { name: "🧠 Device ID", value: deviceId }
           ],
 
           footer: {
