@@ -8,7 +8,6 @@ exports.handler = async (event) => {
 
     const response = await resend.contacts.create({
       email: email,
-      audienceId: process.env.RESEND_AUDIENCE_ID,
     });
 
     return {
