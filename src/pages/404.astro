@@ -1,0 +1,212 @@
+---
+import DocumentHead from '../layouts/DocumentHead.astro';
+import Layout from '../layouts/Layout.astro';
+
+let title = `404 — You broke it | Garden of Thoughts`;
+let permalink = 'https://sanketmaske.dev/404';
+
+
+---
+
+<html lang="en">
+  <DocumentHead title={title} description="You broke it. Or we did. Probably you." permalink={permalink} />
+  <body>
+    <Layout page="">
+      <div class="not-found">
+
+        <span class="error-code">404</span>
+        <span class="error-title">Oh wow!! You actually found nothing.</span>
+
+        <div class="divider-full"></div>
+
+        <p class="roast">
+          Impressive. Out of all the pages that <em>do</em> exist on this site,
+          you managed to navigate to one that doesn't. That takes talent.
+          Questionable talent, but talent nonetheless.
+        </p>
+
+        <p class="roast">
+          <strong>If you're a developer</strong> — you know what you did. That URL was wrong
+          and you knew it before you hit enter. Admit it, you typed it just to see what happens.
+          Congratulations, you found a 404. 
+          Congratulations, you found a 404.<br>
+          Caught you!!!<br>
+          The garden has real paths, real posts, and real content that won't throw errors at you. Use them. We're watching🙃
+        </p>
+
+        <p class="roast">
+          <strong>If you're not a developer</strong> — first of all, hello! I completely
+          trust you. This was clearly an accident and we don't judge accidents here.
+          The garden is actually a lovely place when you're on the right path.
+          Those cards below? They're your map. Pick one, click it, and pretend this
+          never happened. I won't tell anyone. Promise.
+        </p>
+
+      
+        <div class="divider-full"></div>
+
+        <p class="section-label">Since you're already here, maybe try one of these:</p>
+
+        <div class="available-pages">
+          <a href="/" class="page-card">
+            <span class="page-icon">📝</span>
+            <span class="page-name">Posts</span>
+            <span class="page-desc">Actual content. Revolutionary concept.</span>
+          </a>
+          <a href="/tags" class="page-card">
+            <span class="page-icon">🏷️</span>
+            <span class="page-name">Tags</span>
+            <span class="page-desc">Organized chaos. At least it's organized.</span>
+          </a>
+          <a href="/about" class="page-card">
+            <span class="page-icon">👤</span>
+            <span class="page-name">About</span>
+            <span class="page-desc">Who made this? Spoiler: Not You.</span>
+          </a>
+          <a href="/subscribe" class="page-card">
+            <span class="page-icon">📬</span>
+            <span class="page-name">Subscribe</span>
+            <span class="page-desc">Get notified when real pages are added.</span>
+          </a>
+        </div>
+
+        <div class="divider"></div>
+
+        <p class="footer-note">
+          If you think this is a mistake, it probably is. But it's your mistake, not ours.
+          <br/>
+          You can <a href="mailto:sanket.maske@outlook.com">email me</a> about it.
+          I may or may not respond, depending on the email content.
+        </p>
+
+      </div>
+    </Layout>
+  </body>
+</html>
+
+<style>
+  .not-found {
+    padding: 44px 0 60px;
+    max-width: 640px;
+  }
+
+  .error-code {
+    display: block;
+    font-size: 7rem;
+    font-weight: 400;
+    color: var(--text-color);
+    letter-spacing: -0.05em;
+    line-height: 1;
+    opacity: 0.12;
+    user-select: none;
+    font-family: var(--font-mono);
+  }
+
+  .error-title {
+    display: block;
+    font-size: 2rem;
+    font-weight: 400;
+    color: var(--text-color);
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+    opacity: 0.6;
+    margin-top: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .divider-full {
+    height: 5px;
+    background: rgba(120, 130, 200, 0.4);
+    border: none;
+    margin: 1.5rem 0;
+  }
+
+  .divider {
+    height: 1px;
+    background: linear-gradient(to right, rgba(120, 130, 200, 0.4), transparent);
+    border: none;
+    margin: 2rem 0;
+  }
+
+  .roast {
+    font-size: 1rem;
+    color: var(--text-color);
+    line-height: 1.7;
+    margin-bottom: 1.2rem;
+  }
+
+  .roast strong {
+    color: var(--accent-color);
+  }
+
+  .excuse {
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    color: var(--accent-color);
+    margin: 1.5rem 0;
+    min-height: 1.4em;
+    cursor: pointer;
+  }
+
+  .excuse:hover { opacity: 0.7; }
+
+  .section-label {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--second-text-color);
+    margin-bottom: 1rem;
+  }
+
+  .available-pages {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 0.8rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .page-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 1rem 1.2rem;
+    border: 1px dashed rgba(199,99,153,0.4);
+    border-radius: 10px;
+    text-decoration: none;
+    transition: background 0.15s, transform 0.15s;
+  }
+
+  .page-card:hover {
+    background: rgba(199,99,153,0.06);
+    transform: translateY(-2px);
+  }
+
+  .page-icon { font-size: 1.2rem; }
+
+  .page-name {
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--accent-color);
+  }
+
+  .page-desc {
+    font-size: 0.82rem;
+    color: var(--second-text-color);
+    line-height: 1.4;
+  }
+
+  .footer-note {
+    font-size: 1rem;
+    color: var(--second-text-color);
+    line-height: 1.7;
+  }
+
+  .footer-note a {
+    color: var(--accent-color);
+    text-decoration: none;
+  }
+
+  .footer-note a:hover { text-decoration: underline; }
+</style>
