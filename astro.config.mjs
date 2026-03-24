@@ -3,6 +3,7 @@ import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import rehypeExternalLinks from 'rehype-external-links';
 import mdx from '@astrojs/mdx';
+import { remarkReadingTime } from './src/plugins/remarkReadingTime.mjs';
 
 // https://astro.build/config
 export default defineConfig({
@@ -12,6 +13,7 @@ export default defineConfig({
   integrations: [sitemap(),mdx()],
   site: 'https://sanketmaske.dev',
   markdown: {
+    remarkPlugins: [remarkReadingTime],
     shikiConfig: {
       theme: 'material-theme-lighter',
       langs: [],

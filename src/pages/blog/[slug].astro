@@ -12,7 +12,6 @@ const { note } = Astro.props;
 
 export async function getStaticPaths() {
   const notes = await getCollection("posts");
-  console.log('oath : ' + notes.map(n => n.id));
   return [
     ...notes.map((note) => ({
       params: { slug: note.id.replace(".md", "").replace(".mdx", "") },
