@@ -29,7 +29,7 @@ export function formatDate(date:any) {
   });
 }
 const {
-  data: { tags, title, noComments, date, minutesRead},
+  data: { tags, title, noComments, date, minutesRead, excerpt},
 } = note;
 
 const { Content } = await render(note);
@@ -121,7 +121,7 @@ const titleEncoded = encodeURIComponent(`re: ${title}`);
 </style>
 
 <html lang="en">
-  <DocumentHead title={title} description="" permalink={permalink} canonicalUrl={permalink} includeYTResources={includeYTResources} />
+  <DocumentHead title={title} description={excerpt || ''} permalink={permalink} canonicalUrl={permalink} includeYTResources={includeYTResources} />
   <body>
     <Layout page="note">
       <article class="article-wrap">

@@ -18,6 +18,7 @@ const posts = defineCollection({
     title: z.string(),
     date: z.date(),
     tags: z.array(z.string()),
+    excerpt: z.string().optional(),
     draft: z.boolean().optional().default(false),
     noComments: z.boolean().optional().nullable(),
     minutesRead: z.number().optional()
