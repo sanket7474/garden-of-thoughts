@@ -1,0 +1,25 @@
+---
+const {
+  center = false,
+  author,
+  variant = "default"
+} = Astro.props;
+
+const isPoetry = variant === "poetry";
+---
+
+<div class={`quote-wrapper ${center ? 'quote-wrapper--center' : ''}`}>
+  <div class={`quote quote--${variant}`}>
+    
+    <blockquote class={isPoetry ? 'quote__poetry' : ''}>
+      <slot />
+    </blockquote>
+
+    {author && (
+      <div class="quote__author">
+        — {author}
+      </div>
+    )}
+
+  </div>
+</div>
