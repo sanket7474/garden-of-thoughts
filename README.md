@@ -2,7 +2,7 @@
 
 Personal blog by [Sanket Maske](https://sanketmaske.dev) — built with Astro 5, deployed on Netlify.
 
-No niche. No algorithm. Just curiosity.
+URL : [sanketmaske.dev](https://sanketmaske.dev)
 
 ---
 
