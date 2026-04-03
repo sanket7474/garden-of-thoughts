@@ -51,7 +51,7 @@ jobs:
             SLUG=$(basename "$FILE" | sed 's/\.mdx\?$//')
 
             # Extract first paragraph as excerpt (skip frontmatter)
-            EXCERPT=$(awk '/^---/{p++; next} p==2{if(NF>0){print; exit}}' "$FILE")
+            EXCERPT=$(awk '/^---/{p++; next} p==2{if(NF>0 && !/^import /){print; exit}}' "$FILE")
 
             echo "Title: $TITLE"
             echo "Slug: $SLUG"
