@@ -462,3 +462,19 @@ hr {
 .quote--poetry blockquote {
   font-family: "Dancing Script", cursive;
 }
+.ppl-photo {
+    float: right;
+  
+    border-radius: 3%;
+    top: 10%;
+    width: 30%;
+  }
+  @media (max-width: 640px) {
+    
+    .ppl-photo {
+      float: right;
+      
+      border-radius: 3%;
+      width: 50%;
+    }
+  }
