@@ -52,7 +52,7 @@ const { images, label = "from my diary" } = Astro.props;
 
   <div class="diary-lightbox__stage">
     <button class="diary-lightbox__close" id="diary-lb-close" type="button" aria-label="Close">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M18 6L6 18M6 6l12 12"/>
       </svg>
     </button>
@@ -90,7 +90,7 @@ const { images, label = "from my diary" } = Astro.props;
     font-size: 0.72rem;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    opacity: 0.45;
+    opacity: 0.90;
     margin: 0 0 0.85rem 0;
     color: var(--text-color);
   }
@@ -234,7 +234,7 @@ const { images, label = "from my diary" } = Astro.props;
     font-family: var(--font-mono);
     font-size: 0.78rem;
     font-style: italic;
-    color: rgba(242, 240, 233, 0.5);
+    color: rgba(242, 240, 233, 0.9);
     text-align: center;
     margin: 0;
     min-height: 1em;
@@ -245,7 +245,7 @@ const { images, label = "from my diary" } = Astro.props;
     font-size: 0.62rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: rgba(242, 240, 233, 0.22);
+    color: rgba(242, 240, 233, 0.80);
   }
 
   /* Nav */
@@ -255,11 +255,11 @@ const { images, label = "from my diary" } = Astro.props;
     width: 38px;
     height: 38px;
     border-radius: 2px;
-    border: 1px solid rgba(242, 240, 233, 0.18);
+    border: 1px solid rgba(242, 240, 233, 0.80);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: rgba(242, 240, 233, 0.55);
+    color: rgba(242, 240, 233, 0.80);
     transition: background 0.18s, border-color 0.18s, color 0.18s;
     cursor: url("/pointer.svg") 0 0, pointer;
   }
@@ -275,7 +275,7 @@ const { images, label = "from my diary" } = Astro.props;
   }
 
   .diary-lightbox__nav:disabled {
-    opacity: 0.15;
+    opacity: 0.20;
     pointer-events: none;
   }
 
@@ -288,26 +288,23 @@ const { images, label = "from my diary" } = Astro.props;
     width: 30px;
     height: 30px;
     border-radius: 2px;
-    border: 1px solid rgba(242, 240, 233, 0.15);
+    border: 1px solid rgba(242, 240, 233, 0.60);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: rgba(242, 240, 233, 0.4);
+    color: rgba(242, 240, 233, 0.80);
     transition: color 0.18s, border-color 0.18s;
-    cursor: url("/pointer.svg") 0 0, pointer;
   }
   @media (min-width: 640px) {
     .diary-lightbox__close {
         top: -0.50rem;
     }
 }
-  .dark-mode .diary-lightbox__close {
-    cursor: url("/pointer-dark.svg") 0 0, pointer;
-  }
+  
 
   .diary-lightbox__close:hover {
     color: rgba(242, 240, 233, 0.9);
-    border-color: rgba(242, 240, 233, 0.35);
+    border-color: rgba(242, 240, 233, 0.80);
   }
 
   @media (max-width: 480px) {
