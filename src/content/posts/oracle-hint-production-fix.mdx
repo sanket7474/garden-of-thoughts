@@ -18,7 +18,8 @@ This series is about those real issues which you won't find in any tutorial, and
 
 Production Did What Production Does Best
 
-Some days you ship code. Some days code ships you.
+Some days you ship code.  
+Some days code ships you.
 
 We had a huge audit table in our Oracle database where it has millions, possibly billions of records.  
 The kind of table that just keeps growing and nobody really talks about until something breaks.  
@@ -51,8 +52,9 @@ New Relic lost its mind.
 
 ## Why Does Oracle Even Do This?
 
-Fair question. And the answer is:  
-this isn’t some rare edge case.  
+Fair question.  
+And the answer is:    
+This isn’t some rare edge case.  
 This is known Oracle behaviour.  
 The kind that shows up quietly in large production systems  
 and waits for the right moment to cause trouble.
@@ -72,7 +74,7 @@ Stale stats mean wrong decisions. Wrong decisions mean full scans. Full scans on
 ## The Fix
 
 Our DBAs dug into the New Relic traces, identified the offending queries, and came back with a fix that looked almost too simple:  
-add an Oracle query hint directly in the SQL.
+Add an Oracle query hint directly in the SQL.
 
 ``` sql
 
@@ -86,7 +88,7 @@ WHERE ...
 That's it.  
 A comment inside a SQL query that isn't really a comment.  
 
-The `/*+ INDEX(table index) */` hint is a directive that tells Oracle's optimizer: use this index, I'm not asking.  
+The `/*+ INDEX(table index) */` hint is a directive that tells Oracle's optimizer that skip the math, just use this index. 
 
 The optimizer normally picks the execution plan it thinks is cheapest. The hint overrides that decision entirely.
 
