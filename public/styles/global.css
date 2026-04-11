@@ -17,6 +17,8 @@
   --purple: #5741ac;
   --blue: #393f85;
   --accent-color: var(--purple);
+  --shiki-light-bg: #fafafa;
+  --shiki-dark-bg: #212121;
   --gradient-color: linear-gradient(
     45deg,
     hsl(3deg 97% 45%) 0%,
@@ -478,3 +480,8 @@ hr {
       width: 50%;
     }
   }
+.dark-mode .astro-code,
+.dark-mode .astro-code span {
+  color: var(--shiki-dark) !important;
+  background-color: var(--shiki-dark-bg) !important;
+}

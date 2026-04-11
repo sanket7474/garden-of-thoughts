@@ -4,7 +4,7 @@ import sitemap from '@astrojs/sitemap';
 import rehypeExternalLinks from 'rehype-external-links';
 import mdx from '@astrojs/mdx';
 import { remarkReadingTime } from './src/plugins/remarkReadingTime.mjs';
-
+import smartypants from 'remark-smartypants';
 // https://astro.build/config
 export default defineConfig({
     // needed for cloudflare pages to work properly 
@@ -13,12 +13,18 @@ export default defineConfig({
   integrations: [sitemap(),mdx()],
   site: 'https://sanketmaske.dev',
   markdown: {
-    remarkPlugins: [remarkReadingTime],
+    remarkPlugins: [remarkReadingTime,smartypants],
     shikiConfig: {
-      theme: 'material-theme-lighter',
+      themes: {
+    light: 'material-theme-lighter',
+    dark: 'material-theme-darker', // or 'one-dark-pro', 'github-dark', etc.
+  },
       langs: [],
       // Enable word wrap to prevent horizontal scrolling
       wrap: true,
+      
+      
+
     },
     rehypePlugins: [
       [
