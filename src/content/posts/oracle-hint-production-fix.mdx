@@ -1,0 +1,153 @@
+---
+title: "Bugs & Lessons #1 — The Oracle Hint That Saved Production (But Probably Shouldn’t Exist)"
+date: 2026-04-12
+excerpt: An audit table with billions of records, an index Oracle silently ignored, and a fix that works — but doesn’t feel right.
+slug: oracle-hint-production-fix
+tags: ['dev', 'database', 'bugs-and-lessons']
+draft: false
+minutesRead: 7
+---
+
+Every developer has a growing collection of  
+“I had no idea that was even a thing” moments.  
+This series is about those real issues which you won't find in any tutorial, and the fix turns out to be something you'd never have Googled on your own.
+
+---
+
+## What's the issue?
+
+Production Did What Production Does Best
+
+Some days you ship code. Some days code ships you.
+
+We had a huge audit table in our Oracle database where it has millions, possibly billions of records.  
+The kind of table that just keeps growing and nobody really talks about until something breaks.  
+
+And then something broke. 
+
+Queries hitting that table were taking forever.  
+Threads started hanging.  
+The DB spike kept climbing.  
+And none of it was obvious from the application side,  
+everything looked fine until New Relic told us it wasn't.
+
+---
+
+## What Was Actually Going On
+
+The DBAs dug into the New Relic traces and found the problem.  
+The index on the audit table existed but it had failed to apply.  
+Oracle had marked it UNUSABLE at some point, silently, without any noise.  
+
+And because of that, every query hitting that table was doing a full scan through billions of records instead of using the index.
+
+No error.  
+No warning.  
+Just a very expensive query running very quietly in the background,  
+until the threads started piling up and   
+New Relic lost its mind.
+
+--- 
+
+## Why Does Oracle Even Do This?
+
+Fair question. And the answer is:  
+this isn’t some rare edge case.  
+This is known Oracle behaviour.  
+The kind that shows up quietly in large production systems  
+and waits for the right moment to cause trouble.
+
+Indexes in Oracle can go UNUSABLE after a failed maintenance operation,   
+a crashed instance during index build, or a direct path load gone wrong.   
+When that happens, the optimizer doesn't warn you.  
+It just skips the index and falls back to a full table scan.
+
+And even when the index is healthy, Oracle still might not use it.  
+The optimizer decides based on statistics — statistics that go stale  
+on large, constantly growing tables like an audit table.  
+Stale stats mean wrong decisions. Wrong decisions mean full scans. Full scans on billions of rows mean fire.
+
+---
+
+## The Fix
+
+Our DBAs dug into the New Relic traces, identified the offending queries, and came back with a fix that looked almost too simple:  
+add an Oracle query hint directly in the SQL.
+
+``` sql
+
+SELECT /*+ INDEX(audit_table audit_idx) */ 
+*
+FROM audit_table
+WHERE ...
+
+```
+
+That's it.  
+A comment inside a SQL query that isn't really a comment.  
+
+The `/*+ INDEX(table index) */` hint is a directive that tells Oracle's optimizer: use this index, I'm not asking.  
+
+The optimizer normally picks the execution plan it thinks is cheapest. The hint overrides that decision entirely.
+
+
+**Before the hint:** queries timing out, threads hanging, New Relic screaming.  
+**After the hint:** consistent 4–5 second response times on a table with billions of records — which, for an audit flow of that size, is exactly where it should be.
+
+---
+
+## But Here's The Uncomfortable Part 
+
+
+The hint worked.  
+But the hint is also… a bit of a hack.
+
+It's an official Oracle feature but not something you’re supposed to rely on, not a recommended practice.  
+Oracle's own documentation suggests using SQL Tuning Advisor and SQL Plan Management as better long-term alternatives.  
+
+The hint is what you reach for when those aren't an option at 2am with production down 🙃
+
+
+---
+
+## What I Actually Learned
+
+Creating an index and actually using it  
+are two very different things.  
+
+The gap between them  
+is where production fires are born.
+
+Oracle’s optimizer isn’t perfect.  
+On large tables with stale statistics,  
+it will make bad decisions    
+confidently and quietly.
+
+If you’re running an audit table  
+or any append-heavy table at scale,  
+statistics maintenance isn’t optional.  
+It’s basic hygiene.
+
+DBAs know things you won’t find in tutorials.  
+When threads are hanging and the DB is spiking,  
+the people who’ve seen this before  
+are worth listening to quickly.
+
+And finally —  
+when someone gives you a fix that works,  
+take the time to understand why it works,  
+and what it isn’t fixing.
+
+The hint got us out of the fire.  
+The index rebuild and stats refresh  
+are what actually close the door.
+
+### References
+If you want to go deeper, these explain it better than I can:  
+- [Oracle Docs — Managing Indexes & UNUSABLE State](https://docs.oracle.com/en/database/oracle/oracle-database/19/admin/managing-indexes.html)
+- [Oracle Docs — Optimizer Hints](https://docs.oracle.com/cd/B10500_01/server.920/a96533/hintsref.htm)
+- [Oracle Docs — Indexes Left in an Unusable State](https://docs.oracle.com/database/121/SUTIL/GUID-C44AADF7-777D-4847-A5ED-75E36B40D0EB.htm)
+- [IBM Support — Oracle Optimizer Ignoring Indexes, Causing Full Table Scans](https://www.ibm.com/support/pages/database-indexes-are-sometimes-not-used-oracle-optimizer-thus-causing-full-table-scans-and-slow-running-queries)
+- [Oracle Community — Full Table Scan Even Though Indexes Are Defined](https://community.oracle.com/tech/developers/discussion/3897693/full-table-scan-even-though-indexes-are-defined)
+- [Pythian Blog — How to Make Oracle Use the Correct Index (real production case)](https://www.pythian.com/blog/technical-track/how-to-make-oracle-use-the-correct-index)
+
