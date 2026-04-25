@@ -1,10 +1,12 @@
 const configurations = {
   darkMode: 'dark-mode',
   cursorTrails: 'cursor-trails',
+  vines: 'vines',
 };
 const checkboxValues = {
   [configurations.darkMode]: false,
   [configurations.cursorTrails]: false,
+  [configurations.vines]: false,
 };
 
 let trailsScriptsInjected = false;
@@ -15,6 +17,14 @@ function disableOption(option:any) {
   if (option === configurations.darkMode)
     document.documentElement.style.colorScheme = 'light';
   window.localStorage.setItem(option, 'false');
+
+  if(option === configurations.vines) {
+    const canvas = document.querySelector("#vineCanvas");
+
+    canvas.classList.add("hide");
+    window.setVineAnimation?.(false);
+    
+  }
 }
 function enableOption(option:any) {
 
@@ -37,6 +47,12 @@ function enableOption(option:any) {
       'https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.3.1/pixi.min.js';
 
     document.head.appendChild(pixiScript);
+  }
+
+  if(option === configurations.vines) {
+    window.setVineAnimation?.(true);
+    const canvas = document.querySelector("#vineCanvas");
+    canvas.classList.add("show");
   }
 }
 
@@ -82,9 +98,19 @@ addEventListener('DOMContentLoaded', (event) => {
   
   for (const option of Object.values(configurations)) {
 
-    console.log('Setting up option:', option);
+    
 
     const checkbox = document.getElementById(option) as HTMLInputElement;
+    
+    if(option === configurations.vines) {
+      
+      if(checkboxValues[option]) {
+        console.log('Enabling vines animation');
+        window.setVineAnimation?.(true);
+      } else{
+        window.setVineAnimation?.(false);
+      }
+    }
     if (checkbox) {
       checkbox.addEventListener('click', () => {
         

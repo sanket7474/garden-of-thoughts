@@ -128,11 +128,11 @@ const { page } = Astro.props;
 
   .nav li a {
     text-decoration: none;
-    font-size: 1.1em;
+    font-size: 1.2em;
     position: relative;
     display: block;
     transition: padding-right 0.2s ease-in-out;
-    line-height: 1.2;
+    line-height: 1;
   }
 
   .nav li a.rss-link {
@@ -269,7 +269,7 @@ const { page } = Astro.props;
     position: absolute;
     width: 80vw;
     left: -20vw;
-    top: -5%;
+    top: -3%;
     display: block;
     z-index: 99999;
     transform: rotate(10deg) scale(1);
@@ -396,6 +396,12 @@ const { page } = Astro.props;
     <li class="chckbx">
       <label for="dark-mode">Dark Mode</label><input
         id="dark-mode"
+        type="checkbox"
+      />
+    </li>
+    <li class="cursor-trails-setting chckbx">
+      <label for="vines">Garden Vines</label><input
+        id="vines"
         type="checkbox"
       />
     </li>

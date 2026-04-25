@@ -35,8 +35,8 @@ URL : [sanketmaske.dev](https://sanketmaske.dev)
 │   │       └── cursorTrails.js    # custom cursor trail effect
 │   ├── styles/
 │   │   └── global.css             # global styles
-│   ├── cursor.svg / cursor-dark.svg
-│   └── pointer.svg / pointer-dark.svg
+│   ├── cursor.png / cursor-dark.svg
+│   └── pointer.png / pointer-dark.png
 └── src/
     ├── components/
     │   ├── Blockquote.astro       # prop-based blockquote (center, author, accent)

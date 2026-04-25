@@ -83,7 +83,7 @@ body {
 }
 * {
   cursor:
-    url("/cursor.svg") 0 0,
+    url("/cursor.png") 0 0,
     auto;
 }
 a,
@@ -93,7 +93,7 @@ label,
 select,
 summary {
   cursor:
-    url("/pointer.svg") 0 0,
+    url("/pointer.png") 0 0,
     pointer;
 }
 
@@ -104,13 +104,13 @@ label,
 select,
 summary {
   cursor:
-    url("/pointer.svg") 0 0,
+    url("/pointer.png") 0 0,
     pointer;
 }
 
 .dark-mode * {
   cursor:
-    url("/cursor-dark.svg") 0 0,
+    url("/cursor-dark.png") 0 0,
     auto;
 }
 .dark-mode a,
@@ -120,7 +120,7 @@ summary {
 .dark-mode select,
 .dark-mode summary {
   cursor:
-    url("/pointer-dark.svg") 0 0,
+    url("/pointer-dark.png") 0 0,
     pointer;
 }
 
@@ -262,13 +262,13 @@ ol li {
   text-decoration: none;
   color: inherit;
   cursor:
-    url("/pointer.svg") 0 0,
+    url("/pointer.png") 0 0,
     pointer;
 }
 
 .dark-mode .post-row {
   cursor:
-    url("/pointer-dark.svg") 0 0,
+    url("/pointer-dark.png") 0 0,
     pointer;
 }
 .post-title {
@@ -282,13 +282,13 @@ ol li {
   gap: 9px;
   flex-wrap: wrap;
   cursor:
-    url("/pointer.svg") 0 0,
+    url("/pointer.png") 0 0,
     pointer;
 }
 
 .dark-mode .post-title {
   cursor:
-    url("/pointer-dark.svg") 0 0,
+    url("/pointer-dark.png") 0 0,
     pointer;
 }
 
@@ -301,25 +301,25 @@ ol li {
   transition: opacity 0.15s;
   text-decoration: none;
   cursor:
-    url("/pointer.svg") 0 0,
+    url("/pointer.png") 0 0,
     pointer;
 }
 
 .dark-mode .tag {
   cursor:
-    url("/pointer-dark.svg") 0 0,
+    url("/pointer-dark.png") 0 0,
     pointer;
 }
 
 .chckbx {
   cursor:
-    url("/pointer.svg") 0 0,
+    url("/pointer.png") 0 0,
     pointer;
 }
 
 .dark-mode .chckbx {
   cursor:
-    url("/pointer-dark.svg") 0 0,
+    url("/pointer-dark.png") 0 0,
     pointer;
 }
 
@@ -484,4 +484,12 @@ hr {
 .dark-mode .astro-code span {
   color: var(--shiki-dark) !important;
   background-color: var(--shiki-dark-bg) !important;
+}
+
+.show {
+  display: block;
+}
+
+.hide {
+  display: none;
 }

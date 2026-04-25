@@ -5,6 +5,7 @@ type Props = {
 
 import Sidebar from './Sidebar.astro';
 import Footer from './Footer.astro';
+import Vines from './Vines.astro';
 
 const { page } = Astro.props;
 ---
@@ -54,6 +55,7 @@ const { page } = Astro.props;
     <main>
       <slot />
     </main>
+    <Vines />
     <Footer />
   </div>
 </div>

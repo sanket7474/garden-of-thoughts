@@ -1,0 +1,973 @@
+---
+
+---
+
+<html>
+  <head>
+    <style>
+
+      main {
+        width: min(1120px, calc(100vw - 32px));
+        margin: 0 auto;
+        padding: 44px 0;
+      }
+
+      header {
+        margin-bottom: 28px;
+      }
+
+      header p {
+        margin: 0 0 10px;
+        color: #4b3a78;
+        font-size: 0.82rem;
+        font-weight: 750;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        margin: 0;
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: clamp(2.8rem, 8vw, 6rem);
+        line-height: 0.92;
+        letter-spacing: 0;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      article {
+        overflow: hidden;
+        min-height: 320px;
+        border: 2px solid rgba(64, 43, 117, 0.2);
+        border-radius: 8px;
+        background: rgba(243, 237, 255, 0.22);
+      }
+
+      canvas {
+        display: none;
+        width: 100%;
+        height: 260px;
+      }
+
+      h2 {
+        margin: 0;
+        padding: 14px 18px 18px;
+        color: #3f2b75;
+        font-size: 1rem;
+      }
+
+      @media (max-width: 720px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      @media (max-width: 700px) {
+        #vineCanvas {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="vineCanvas" aria-label="Animated growing vine"></canvas>
+  </body>
+  <script>
+    const canvas = document.querySelector("#vineCanvas");
+    const ctx = canvas.getContext("2d");
+
+    const TAU = Math.PI * 2;
+    const rand = mulberry32(42);
+    const MIN_BRANCH_DURATION = 0.045;
+    const MAX_BRANCH_DURATION = 0.16;
+    const vine = {
+      points: [],
+      leaves: [],
+      flowers: [],
+      clusters: [],
+      tendrils: [],
+      branches: [],
+      tangles: [],
+      grow: 0,
+      target: 1,
+      age: 0,
+      lastFrame: 0,
+    };
+
+    function mulberry32(seed) {
+      return function random() {
+        let t = (seed += 0x6d2b79f5);
+        t = Math.imul(t ^ (t >>> 15), t | 1);
+        t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
+    }
+
+    function resize() {
+      const scale = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.floor(innerWidth * scale);
+      canvas.height = Math.floor(innerHeight * scale);
+      canvas.style.width = `${innerWidth}px`;
+      canvas.style.height = `${innerHeight}px`;
+      ctx.setTransform(scale, 0, 0, scale, 0, 0);
+      buildVine();
+    }
+
+    function buildVine() {
+      vine.points = [];
+      vine.leaves = [];
+      vine.flowers = [];
+      vine.clusters = [];
+      vine.tendrils = [];
+      vine.branches = [];
+      vine.tangles = [];
+
+      const h = innerHeight;
+      const w = innerWidth;
+      const rightEdge = w - Math.max(18, Math.min(42, w * 0.045));
+      const segments = Math.max(96, Math.floor(h / 6));
+
+      for (let i = 0; i <= segments; i++) {
+        const t = i / segments;
+        const y = h + 44 - t * (h + 120);
+        const supportPull = Math.pow(t, 0.65) * 28;
+        const gravitySag = Math.sin(t * Math.PI) * 48;
+        const curl = Math.sin(t * 15.4) * 18 + Math.sin(t * 33.5) * 8;
+        const x = rightEdge - supportPull - gravitySag + curl;
+        vine.points.push({ x, y, t });
+      }
+
+      for (let i = 7; i < segments - 7; i += 3) {
+        const t = i / segments;
+        const p = vine.points[i];
+        const side = rand() > 0.48 ? 1 : -1;
+        const large = 0.72 + rand() * 0.72;
+        const leafSides = i % 6 === 1 ? [side, -side] : [side];
+        leafSides.forEach((leafSide, sideIndex) => {
+          vine.leaves.push({
+            index: i,
+            t,
+            side: leafSide,
+            size: (9 + rand() * 14) * large,
+            rotate: leafSide * (0.45 + rand() * 0.72),
+            offset: 5 + rand() * 12 + sideIndex * 3,
+            hue: 87 + rand() * 34,
+            delay: Math.min(
+              0.985,
+              t + 0.012 + rand() * 0.018 + sideIndex * 0.01,
+            ),
+            vein: rand(),
+            x: p.x,
+            y: p.y,
+          });
+        });
+
+        if (i % 9 === 0 || rand() > 0.75) {
+          vine.flowers.push({
+            index: Math.min(i + 2, segments),
+            t,
+            side: -side,
+            size: 10 + rand() * 9,
+            petals: 5 + Math.floor(rand() * 3),
+            delay: Math.min(0.99, t + 0.025 + rand() * 0.02),
+            tint: rand(),
+          });
+        }
+
+        if (i % 13 === 0 || rand() > 0.84) {
+          vine.clusters.push({
+            index: Math.min(i + 1, segments),
+            t,
+            side,
+            size: 20 + rand() * 20,
+            count: 13 + Math.floor(rand() * 14),
+            delay: Math.min(0.99, t + 0.025 + rand() * 0.02),
+            depth: rand(),
+          });
+        }
+      }
+
+      for (let i = 12; i < segments - 8; i += 7) {
+        const t = i / segments;
+        const side = rand() > 0.46 ? 1 : -1;
+        const duration = Math.min(
+          MAX_BRANCH_DURATION,
+          Math.max(MIN_BRANCH_DURATION, 0.985 - t),
+        );
+        const branch = {
+          index: i,
+          t,
+          side,
+          length: 34 + rand() * 66,
+          climb: 0.2 + rand() * 0.32,
+          droop: 14 + rand() * 34,
+          curve: (rand() - 0.5) * 18,
+          curl: 7 + rand() * 16,
+          delay: Math.min(0.985, t + 0.01 + rand() * 0.012),
+          duration,
+          width: 1.6 + rand() * 2.1,
+        };
+        vine.branches.push(branch);
+
+        for (let j = 0; j < 5 + Math.floor(rand() * 5); j++) {
+          const progress = 0.25 + rand() * 0.72;
+          const leafSide = j % 2 === 0 ? 1 : -1;
+          vine.leaves.push({
+            branch,
+            progress,
+            t: Math.min(1, t + progress * 0.08),
+            side: leafSide,
+            size: 10 + rand() * 15,
+            rotate: leafSide * (0.55 + rand() * 0.82),
+            offset: 3 + rand() * 9,
+            hue: 82 + rand() * 38,
+            delay: Math.min(
+              0.992,
+              branch.delay + progress * branch.duration + rand() * 0.012,
+            ),
+            vein: rand(),
+          });
+        }
+
+        if (rand() > 0.12) {
+          vine.clusters.push({
+            branch,
+            progress: 0.72 + rand() * 0.2,
+            t,
+            side,
+            size: 22 + rand() * 24,
+            count: 18 + Math.floor(rand() * 18),
+            delay: Math.min(
+              0.992,
+              branch.delay + 0.78 * branch.duration + rand() * 0.012,
+            ),
+            depth: rand(),
+          });
+        }
+      }
+
+      for (let i = 18; i < segments - 16; i += 19) {
+        vine.tendrils.push({
+          index: i,
+          t: i / segments,
+          side: rand() > 0.45 ? 1 : -1,
+          length: 28 + rand() * 44,
+          curl: 1.5 + rand() * 1.6,
+          delay: Math.min(0.99, i / segments + 0.02 + rand() * 0.02),
+        });
+      }
+
+      for (let strand = 0; strand < 3; strand++) {
+        vine.tangles.push({
+          offset: 10 + strand * 8 + rand() * 10,
+          phase: rand() * TAU,
+          wave: 10 + rand() * 12,
+          side: strand % 2 === 0 ? -1 : 1,
+          width: 1.7 + rand() * 1.3,
+        });
+      }
+    }
+
+    function getBranchPoint(branch, progress, time) {
+      const base = getAnimatedPoint(branch.index, time, 0.8);
+      const stemAngle = getStemTangent(branch.index, time);
+      const outwardAngle = stemAngle + branch.side * Math.PI * 0.5;
+      const p = easeOutCubic(progress);
+      const sideReach = branch.length * p;
+      const climbReach = branch.length * branch.climb * p;
+      const curl =
+        Math.sin(progress * Math.PI) * branch.curve +
+        Math.sin(progress * TAU * 1.15 + branch.t * 8) * branch.curl * p;
+      const wind =
+        Math.sin(time * 1.45 + branch.t * 18 + progress * 4) * 2.4 * p;
+      const x =
+        base.x +
+        Math.cos(outwardAngle) * sideReach +
+        Math.cos(stemAngle) * climbReach +
+        Math.cos(outwardAngle) * curl +
+        wind;
+      const y =
+        base.y +
+        Math.sin(outwardAngle) * sideReach +
+        Math.sin(stemAngle) * climbReach +
+        Math.sin(outwardAngle) * curl +
+        branch.droop * progress * progress;
+      return { x, y };
+    }
+
+    function getBranchTangent(branch, progress, time) {
+      const a = getBranchPoint(branch, Math.max(0, progress - 0.03), time);
+      const b = getBranchPoint(branch, Math.min(1, progress + 0.03), time);
+      return Math.atan2(b.y - a.y, b.x - a.x);
+    }
+
+    function getStemTangent(index, time) {
+      const a = getAnimatedPoint(Math.max(0, index - 2), time);
+      const b = getAnimatedPoint(
+        Math.min(vine.points.length - 1, index + 2),
+        time,
+      );
+      return Math.atan2(b.y - a.y, b.x - a.x);
+    }
+
+    function getAnchor(item, time) {
+      if (item.branch) {
+        return {
+          ...getBranchPoint(item.branch, item.progress, time),
+          tangent: getBranchTangent(item.branch, item.progress, time),
+        };
+      }
+      return {
+        ...getAnimatedPoint(item.index, time),
+        tangent: getStemTangent(item.index, time),
+      };
+    }
+
+    function visiblePoint(index) {
+      return vine.points[Math.max(0, Math.min(index, vine.points.length - 1))];
+    }
+
+    function getAnimatedPoint(index, time, windStrength = 1) {
+      const p = visiblePoint(index);
+      const wave = Math.sin(time * 1.65 + p.t * 12) * 6 * windStrength;
+      const smallWave = Math.sin(time * 2.7 + p.t * 31) * 2.4 * windStrength;
+      const gravity = Math.sin(p.t * Math.PI) * 6;
+      return { x: p.x + wave + smallWave - gravity, y: p.y };
+    }
+
+    function lerp(a, b, t) {
+      return a + (b - a) * t;
+    }
+
+    function getAnimatedPointAt(position, time, windStrength = 1) {
+      const lower = Math.floor(position);
+      const upper = Math.min(vine.points.length - 1, lower + 1);
+      const mix = position - lower;
+      const a = getAnimatedPoint(lower, time, windStrength);
+      const b = getAnimatedPoint(upper, time, windStrength);
+      return { x: lerp(a.x, b.x, mix), y: lerp(a.y, b.y, mix) };
+    }
+
+    function easeOutCubic(x) {
+      return 1 - Math.pow(1 - Math.min(Math.max(x, 0), 1), 3);
+    }
+
+    function drawBranch(branch, time) {
+      if (vine.grow < branch.delay) return;
+
+      const growth = easeOutCubic((vine.grow - branch.delay) / branch.duration);
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+
+      for (let pass = 0; pass < 2; pass++) {
+        const steps = Math.max(8, Math.floor(24 * growth));
+        for (let i = 0; i < steps; i++) {
+          const aProgress = (i / steps) * growth;
+          const bProgress = ((i + 1) / steps) * growth;
+          const a = getBranchPoint(branch, aProgress, time);
+          const b = getBranchPoint(branch, bProgress, time);
+          const taper = 1 - bProgress * 0.62;
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
+          ctx.strokeStyle = pass === 0 ? "rgba(32, 42, 24, 0.24)" : "#586534";
+          ctx.lineWidth =
+            (pass === 0 ? branch.width + 3.2 : branch.width) * taper;
+          ctx.stroke();
+        }
+      }
+
+      const steps = Math.max(8, Math.floor(24 * growth));
+      for (let i = 0; i < steps; i++) {
+        const aProgress = (i / steps) * growth;
+        const bProgress = ((i + 1) / steps) * growth;
+        const a = getBranchPoint(branch, aProgress, time);
+        const b = getBranchPoint(branch, bProgress, time);
+        ctx.beginPath();
+        ctx.moveTo(a.x + branch.side * 0.8, a.y - 0.4);
+        ctx.lineTo(b.x + branch.side * 0.8, b.y - 0.4);
+        ctx.strokeStyle = "rgba(185, 148, 78, 0.38)";
+        ctx.lineWidth = Math.max(0.35, 0.8 * (1 - bProgress * 0.7));
+        ctx.stroke();
+      }
+    }
+
+    function drawTangleStrands(time) {
+      const end = (vine.points.length - 1) * vine.grow;
+      const max = Math.floor(end);
+      if (end < 2) return;
+
+      vine.tangles.forEach((strand) => {
+        for (let pass = 0; pass < 2; pass++) {
+          ctx.beginPath();
+          for (let i = 0; i <= max + 1; i++) {
+            const position = Math.min(i, end);
+            const p = getAnimatedPointAt(position, time, 0.9);
+            const t = position / Math.max(1, vine.points.length - 1);
+            const twist =
+              Math.sin(t * 28 + strand.phase + time * 1.25) * strand.wave;
+            const wrap = Math.sin(t * 10 + strand.phase) * strand.offset;
+            const x = p.x + strand.side * wrap + twist * 0.35;
+            const y = p.y + Math.cos(t * 18 + strand.phase) * 4;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+          ctx.strokeStyle =
+            pass === 0 ? "rgba(30, 42, 23, 0.22)" : "rgba(79, 100, 45, 0.8)";
+          ctx.lineWidth = pass === 0 ? strand.width + 2.2 : strand.width;
+          ctx.lineCap = "round";
+          ctx.lineJoin = "round";
+          ctx.stroke();
+        }
+      });
+    }
+
+    function drawStem(time) {
+      const end = (vine.points.length - 1) * vine.grow;
+      const max = Math.floor(end);
+      if (end < 2) return;
+
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+
+      for (let pass = 0; pass < 4; pass++) {
+        ctx.beginPath();
+        for (let i = 0; i <= max + 1; i++) {
+          const p = getAnimatedPointAt(Math.min(i, end), time);
+          if (i === 0) ctx.moveTo(p.x, p.y);
+          else ctx.lineTo(p.x, p.y);
+        }
+
+        if (pass === 0) {
+          ctx.strokeStyle = "rgba(31, 41, 24, 0.2)";
+          ctx.lineWidth = 17;
+        } else if (pass === 1) {
+          ctx.strokeStyle = "#4d5d2e";
+          ctx.lineWidth = 9;
+        } else if (pass === 2) {
+          ctx.strokeStyle = "#70783a";
+          ctx.lineWidth = 5;
+        } else {
+          ctx.strokeStyle = "rgba(168, 135, 67, 0.58)";
+          ctx.lineWidth = 1.6;
+        }
+        ctx.stroke();
+      }
+
+      ctx.beginPath();
+      for (let i = 0; i <= max + 1; i += 2) {
+        const p = getAnimatedPointAt(Math.min(i, end), time, 0.7);
+        if (i === 0) ctx.moveTo(p.x + 2, p.y);
+        else ctx.lineTo(p.x + 2, p.y);
+      }
+      ctx.strokeStyle = "rgba(214, 229, 132, 0.38)";
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+
+    function drawLeaf(leaf, time) {
+      if (vine.grow < leaf.delay) return;
+
+      const bloom = easeOutCubic((vine.grow - leaf.delay) / 0.22);
+      const anchor = getAnchor(leaf, time);
+      const outward = anchor.tangent + leaf.side * (Math.PI * 0.5);
+      const stemAngle = outward + leaf.side * 0.28;
+      const sway = Math.sin(time * 2.2 + leaf.t * 18) * 0.12;
+      const angle = stemAngle + leaf.rotate * 0.12 + sway;
+      const size = leaf.size * bloom;
+      const petiole = (leaf.offset + size * 0.24) * bloom;
+      const baseX = anchor.x + Math.cos(outward) * petiole;
+      const baseY = anchor.y + Math.sin(outward) * petiole;
+      const controlX =
+        anchor.x + Math.cos(outward + leaf.side * 0.35) * petiole * 0.55;
+      const controlY =
+        anchor.y + Math.sin(outward + leaf.side * 0.35) * petiole * 0.55;
+
+      ctx.beginPath();
+      ctx.moveTo(anchor.x, anchor.y);
+      ctx.quadraticCurveTo(controlX, controlY, baseX, baseY);
+      ctx.strokeStyle = "rgba(77, 96, 45, 0.84)";
+      ctx.lineWidth = Math.max(1, size * 0.055);
+      ctx.lineCap = "round";
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(anchor.x + leaf.side * 0.7, anchor.y - 0.4);
+      ctx.quadraticCurveTo(
+        controlX + leaf.side * 0.7,
+        controlY - 0.3,
+        baseX + leaf.side * 0.5,
+        baseY - 0.2,
+      );
+      ctx.strokeStyle = "rgba(190, 157, 83, 0.36)";
+      ctx.lineWidth = Math.max(0.6, size * 0.018);
+      ctx.stroke();
+
+      ctx.save();
+      ctx.translate(baseX, baseY);
+      ctx.rotate(angle);
+      ctx.scale(leaf.side, 1);
+
+      const leafPalettes = [
+        ["#5f8b3d", "#91b75a", "#35572b"],
+        ["#4f7e3a", "#83aa4d", "#2f4d2c"],
+        ["#6f943f", "#a8c969", "#405f2f"],
+        ["#476f39", "#7fa65b", "#2b4630"],
+      ];
+      const [baseGreen, lightGreen, inkGreen] =
+        leafPalettes[
+          Math.floor(leaf.vein * leafPalettes.length) % leafPalettes.length
+        ];
+
+      ctx.beginPath();
+      ctx.moveTo(-size * 0.06, size * 0.1);
+      ctx.bezierCurveTo(
+        size * 0.08,
+        -size * 0.44,
+        size * 0.6,
+        -size * 0.66,
+        size * 1.18,
+        -size * 0.08,
+      );
+      ctx.bezierCurveTo(
+        size * 0.72,
+        size * 0.56,
+        size * 0.2,
+        size * 0.6,
+        -size * 0.06,
+        size * 0.1,
+      );
+      ctx.closePath();
+      ctx.fillStyle = "rgba(42, 49, 30, 0.18)";
+      ctx.translate(size * 0.05, size * 0.08);
+      ctx.fill();
+      ctx.translate(-size * 0.05, -size * 0.08);
+
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.bezierCurveTo(
+        size * 0.1,
+        -size * 0.55,
+        size * 0.62,
+        -size * 0.72,
+        size * 1.22,
+        -size * 0.08,
+      );
+      ctx.bezierCurveTo(
+        size * 0.74,
+        size * 0.62,
+        size * 0.18,
+        size * 0.56,
+        0,
+        0,
+      );
+      ctx.closePath();
+      ctx.fillStyle = baseGreen;
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(size * 0.08, -size * 0.02);
+      ctx.bezierCurveTo(
+        size * 0.18,
+        -size * 0.42,
+        size * 0.64,
+        -size * 0.52,
+        size * 1.08,
+        -size * 0.08,
+      );
+      ctx.bezierCurveTo(
+        size * 0.82,
+        size * 0.08,
+        size * 0.42,
+        size * 0.16,
+        size * 0.08,
+        -size * 0.02,
+      );
+      ctx.closePath();
+      ctx.fillStyle = lightGreen;
+      ctx.globalAlpha = 0.82;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.bezierCurveTo(
+        size * 0.1,
+        -size * 0.55,
+        size * 0.62,
+        -size * 0.72,
+        size * 1.22,
+        -size * 0.08,
+      );
+      ctx.bezierCurveTo(
+        size * 0.74,
+        size * 0.62,
+        size * 0.18,
+        size * 0.56,
+        0,
+        0,
+      );
+      ctx.closePath();
+      ctx.strokeStyle = inkGreen;
+      ctx.lineWidth = Math.max(1.1, size * 0.035);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(size * 1.13, 0);
+      ctx.strokeStyle = inkGreen;
+      ctx.lineWidth = Math.max(1, size * 0.052);
+      ctx.stroke();
+
+      for (let i = 0.28; i < 0.92; i += 0.18) {
+        ctx.beginPath();
+        ctx.moveTo(size * i, 0);
+        ctx.lineTo(size * (i - 0.12), -size * 0.2);
+        ctx.moveTo(size * i, 0);
+        ctx.lineTo(size * (i - 0.12), size * 0.18);
+        ctx.strokeStyle = inkGreen;
+        ctx.globalAlpha = 0.72;
+        ctx.lineWidth = Math.max(0.8, size * 0.022);
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+      }
+
+      ctx.restore();
+    }
+
+    function shade(hex, amount) {
+      const num = parseInt(hex.slice(1), 16);
+      const r = Math.max(0, Math.min(255, (num >> 16) + amount));
+      const g = Math.max(0, Math.min(255, ((num >> 8) & 255) + amount));
+      const b = Math.max(0, Math.min(255, (num & 255) + amount));
+      return `rgb(${r}, ${g}, ${b})`;
+    }
+
+    function drawFlowerCenter(size, color) {
+      ctx.beginPath();
+      ctx.arc(0, 0, size * 0.24, 0, TAU);
+      ctx.fillStyle = color;
+      ctx.fill();
+    }
+
+    function drawDaisyFlower(size, color, centerColor) {
+      for (let i = 0; i < 7; i++) {
+        ctx.save();
+        ctx.rotate((i / 7) * TAU);
+        ctx.beginPath();
+        ctx.ellipse(0, -size * 0.72, size * 0.24, size * 0.58, 0, 0, TAU);
+        ctx.fillStyle = i % 2 ? color : shade(color, -18);
+        ctx.fill();
+        ctx.restore();
+      }
+      drawFlowerCenter(size, centerColor);
+    }
+
+    function drawBellFlower(size, color) {
+      ctx.save();
+      ctx.rotate(Math.PI);
+      ctx.beginPath();
+      ctx.moveTo(-size * 0.46, -size * 0.25);
+      ctx.bezierCurveTo(
+        -size * 0.56,
+        size * 0.2,
+        -size * 0.24,
+        size * 0.72,
+        0,
+        size * 0.8,
+      );
+      ctx.bezierCurveTo(
+        size * 0.24,
+        size * 0.72,
+        size * 0.56,
+        size * 0.2,
+        size * 0.46,
+        -size * 0.25,
+      );
+      ctx.bezierCurveTo(
+        size * 0.22,
+        -size * 0.46,
+        -size * 0.22,
+        -size * 0.46,
+        -size * 0.46,
+        -size * 0.25,
+      );
+      ctx.fillStyle = color;
+      ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(-size * 0.28, size * 0.58);
+      ctx.quadraticCurveTo(0, size * 0.88, size * 0.28, size * 0.58);
+      ctx.strokeStyle = shade(color, -32);
+      ctx.lineWidth = size * 0.09;
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawTropicalFlower(size, color, centerColor) {
+      for (let i = 0; i < 5; i++) {
+        ctx.save();
+        ctx.rotate((i / 5) * TAU);
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.bezierCurveTo(
+          -size * 0.62,
+          -size * 0.34,
+          -size * 0.42,
+          -size * 1.08,
+          0,
+          -size * 1.06,
+        );
+        ctx.bezierCurveTo(
+          size * 0.52,
+          -size * 1,
+          size * 0.68,
+          -size * 0.26,
+          0,
+          0,
+        );
+        ctx.fillStyle = i % 2 ? color : shade(color, -16);
+        ctx.fill();
+        ctx.restore();
+      }
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(size * 0.9, -size * 0.18);
+      ctx.strokeStyle = "#f0c844";
+      ctx.lineWidth = size * 0.12;
+      ctx.stroke();
+      drawFlowerCenter(size, centerColor);
+    }
+
+    function drawRoundLayeredFlower(size, color, centerColor) {
+      for (let layer = 0; layer < 2; layer++) {
+        const count = layer ? 6 : 8;
+        const layerSize = layer ? size * 0.72 : size;
+        for (let i = 0; i < count; i++) {
+          ctx.save();
+          ctx.rotate((i / count) * TAU + layer * 0.28);
+          ctx.beginPath();
+          ctx.ellipse(
+            0,
+            -layerSize * 0.48,
+            layerSize * 0.3,
+            layerSize * 0.46,
+            0,
+            0,
+            TAU,
+          );
+          ctx.fillStyle = layer ? shade(color, 18) : color;
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+      drawFlowerCenter(size, centerColor);
+    }
+
+    function drawMixedFlower(type, size, palette) {
+      const [color, accent, centerColor] = palette;
+      if (type === 0) drawRoundLayeredFlower(size, color, centerColor);
+      else if (type === 1) drawTropicalFlower(size, color, centerColor);
+      else if (type === 2) drawDaisyFlower(size, color, centerColor);
+      else drawBellFlower(size, accent);
+    }
+
+    function drawFlower(flower, time) {
+      if (vine.grow < flower.delay) return;
+
+      const bloom = easeOutCubic((vine.grow - flower.delay) / 0.2);
+      const p = getAnchor(flower, time);
+      const side = flower.side;
+      const x =
+        p.x +
+        side * (18 + flower.size * 1.5) +
+        Math.sin(time * 2 + flower.t * 17) * 2;
+      const y = p.y + Math.sin(time * 1.4 + flower.t * 13) * 4;
+      const size = flower.size * bloom;
+      const flowerPalettes = [
+        ["#ff6fb0", "#c23b86", "#6f5524"],
+        ["#b874ff", "#6e45c8", "#d4bd4a"],
+        ["#ff8b61", "#d95782", "#7f6123"],
+        ["#f4edff", "#c9b9ef", "#89933e"],
+        ["#f7d950", "#e89a48", "#a54e98"],
+        ["#ffffff", "#dbcff1", "#8b9440"],
+      ];
+      const palette =
+        flowerPalettes[
+          Math.min(
+            flowerPalettes.length - 1,
+            Math.floor(flower.tint * flowerPalettes.length),
+          )
+        ];
+      const [petalColor, petalShadow, centerColor] = palette;
+
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y);
+      ctx.quadraticCurveTo(
+        (p.x + x) * 0.5 + side * 4,
+        (p.y + y) * 0.5 + 8,
+        x,
+        y,
+      );
+      ctx.strokeStyle = "rgba(76, 104, 45, 0.72)";
+      ctx.lineWidth = 1.8 * bloom;
+      ctx.lineCap = "round";
+      ctx.stroke();
+
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(Math.sin(time + flower.t * 20) * 0.15);
+      drawMixedFlower(Math.floor(flower.tint * 4), size * 0.9, [
+        petalColor,
+        petalShadow,
+        centerColor,
+      ]);
+      ctx.restore();
+    }
+
+    function drawCluster(cluster, time) {
+      if (vine.grow < cluster.delay) return;
+
+      const bloom = easeOutCubic((vine.grow - cluster.delay) / 0.24);
+      const p = getAnchor(cluster, time);
+      const side = cluster.side;
+      const baseX = p.x + side * (24 + cluster.size * 0.45);
+      const baseY = p.y + Math.sin(time * 1.5 + cluster.t * 14) * 5;
+      const spread = cluster.size * bloom;
+
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y);
+      ctx.quadraticCurveTo(
+        (p.x + baseX) * 0.5 + side * 9,
+        (p.y + baseY) * 0.5 + 12,
+        baseX,
+        baseY,
+      );
+      ctx.strokeStyle = "rgba(70, 96, 42, 0.75)";
+      ctx.lineWidth = 2.2 * bloom;
+      ctx.lineCap = "round";
+      ctx.stroke();
+
+      ctx.save();
+      ctx.translate(baseX, baseY);
+      ctx.rotate(side * 0.12 + Math.sin(time + cluster.t * 9) * 0.06);
+
+      for (let i = 0; i < cluster.count; i++) {
+        const a = (i / cluster.count) * TAU * 2.2 + cluster.depth * 3;
+        const r = Math.sqrt(i / cluster.count) * spread;
+        const x = Math.cos(a) * r * 0.78;
+        const y = Math.sin(a) * r * 0.5 - r * 0.18;
+        const size = (4.2 + (i % 4) * 0.75) * bloom;
+        const palette = [
+          ["#ff67b3", "#c13a8d", "#775c24"],
+          ["#b86dff", "#7447c8", "#d6bd45"],
+          ["#ff8665", "#d65a89", "#7a5a24"],
+          ["#f5f0ff", "#cdbff0", "#8c973e"],
+          ["#ffe055", "#e6a046", "#a54b95"],
+          ["#fefefe", "#d9cdf0", "#87903c"],
+        ][i % 6];
+
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(x * 0.86, y * 0.86);
+        ctx.strokeStyle = "rgba(70, 93, 45, 0.34)";
+        ctx.lineWidth = 0.8;
+        ctx.stroke();
+
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(a + Math.sin(time * 1.1 + i) * 0.15);
+        drawMixedFlower(
+          (i + Math.floor(cluster.depth * 9)) % 4,
+          size * 0.82,
+          palette,
+        );
+        ctx.restore();
+      }
+
+      ctx.restore();
+    }
+
+    function drawTendril(tendril, time) {
+      if (vine.grow < tendril.delay) return;
+
+      const bloom = easeOutCubic((vine.grow - tendril.delay) / 0.22);
+      const p = getAnimatedPoint(tendril.index, time);
+      const side = tendril.side;
+      const length = tendril.length * bloom;
+
+      ctx.beginPath();
+      for (let i = 0; i <= 32; i++) {
+        const t = i / 32;
+        const droop = t * t * 22;
+        const wave =
+          Math.sin(t * TAU * tendril.curl + time * 1.8) * 10 * (1 - t * 0.28);
+        const x = p.x + side * (t * length + wave);
+        const y = p.y + t * 12 + droop;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = "rgba(72, 102, 45, 0.82)";
+      ctx.lineWidth = 2.1;
+      ctx.lineCap = "round";
+      ctx.stroke();
+    }
+
+    function drawSupportShadow(time) {
+      const x = innerWidth - Math.max(9, Math.min(19, innerWidth * 0.02));
+      ctx.save();
+      ctx.globalAlpha = 0.28;
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      for (let y = 0; y <= innerHeight; y += 18) {
+        const wobble = Math.sin(y * 0.025 + time * 0.8) * 2;
+        ctx.lineTo(x + wobble, y);
+      }
+      ctx.strokeStyle = "#5e7442";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function draw(timeStamp) {
+      const time = timeStamp / 1000;
+      const delta = vine.lastFrame
+        ? Math.min(0.05, time - vine.lastFrame)
+        : 1 / 60;
+      vine.lastFrame = time;
+      vine.age = time;
+      vine.grow = Math.min(vine.target, vine.grow + delta * 0.055);
+
+      ctx.clearRect(0, 0, innerWidth, innerHeight);
+      drawSupportShadow(time);
+      drawStem(time);
+      drawTangleStrands(time);
+
+      vine.branches.forEach((branch) => drawBranch(branch, time));
+      vine.tendrils.forEach((tendril) => drawTendril(tendril, time));
+      vine.leaves.forEach((leaf) => drawLeaf(leaf, time));
+      vine.clusters.forEach((cluster) => drawCluster(cluster, time));
+      vine.flowers.forEach((flower) => drawFlower(flower, time));
+
+      requestAnimationFrame(draw);
+    }
+
+    window.addEventListener("resize", resize);
+    resize();
+    requestAnimationFrame(draw);
+
+    window.setVineAnimation = function (enabled) {
+
+    const canvas = document.querySelector("#vineCanvas");
+    canvas.style.display = enabled ? "block" : "none";
+
+    if (enabled) {
+    vine.grow = 0;
+    vine.lastFrame = 0;
+    requestAnimationFrame(draw);
+    }
+};
+  </script>
+</html>
