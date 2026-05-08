@@ -1,0 +1,168 @@
+---
+title: Gita Reels — Built an Automation That Posts Daily. The Experiment Continues.
+date: 2026-05-08
+excerpt: I heard posting daily grows your Instagram. I'm a developer. I automated the whole thing. Two months, 60+ reels, zero growth. Turns out automation can't fix content.
+slug: gita-reels-automation
+tags: ['dev']
+draft: false
+minutesRead: 5
+---
+
+Someone on the internet said posting daily on Instagram grows your page.  
+A normal person would have just posted daily.  
+I am not a normal person. I am a developer.  
+So I automated the whole thing.
+
+---
+
+## The Build
+
+The idea was simple.  
+Every morning at 6:30 AM IST,  
+a GitHub Actions workflow wakes up,  
+picks a Bhagavad Gita quote for the day,  
+generates a reel video,  
+and posts it to Instagram.  
+No manual work. No reminders. No me.
+
+The stack:
+
+- **Python + MoviePy** — generates the reel video
+- **GitHub Actions** — runs the whole pipeline daily
+- **GitHub Pages** — hosts the video as a public URL (Instagram needs one)
+- **Meta Graph API** — posts to Instagram
+
+Each reel is a 1080×1920 vertical video.  
+Gold typography on a dark background.  
+Sanskrit, English, and Hindi translation of the quote.  
+Background music that rotates randomly, trimmed to 12 seconds, fades in and out.
+
+The whole thing runs while I'm asleep.  
+Which is honestly the best part.
+
+One more thing worth mentioning —  
+I didn't write this from scratch line by line.  
+This was vibe coded.  
+AI wrote most of it. I provided the idea, the direction, and the common sense 🙃  
+That's the real developer privilege, not knowing everything, but knowing enough to make something work.
+
+---
+
+## The Part Nobody Warns You About
+
+The pipeline took a few days to build.  
+The Meta API took 2-3 weeks.
+
+Not because the API is complicated.  
+Because getting *access* to the API is a journey designed by someone who genuinely does not want you to succeed.
+
+First you create a Meta developer account.  
+Then you create an app.  
+Then you figure out which type of app.  
+Then you add the right permissions.  
+Then you realise you need a Facebook Page linked to your Instagram.  
+Then you need a Business account.  
+Then the access token expires.  
+Then you generate a new one.  
+Then you read the docs and the docs are from 2019.  
+Then you find a Stack Overflow answer that works but nobody knows why.
+
+At some point you stop understanding what you're configuring  
+and you're just clicking buttons hoping something turns green.
+And it eventually did. I still don't fully know why.
+
+---
+
+## Finally It Worked!
+
+And then one morning, it just worked.
+
+6:30 AM IST.  
+No alarm. No reminder. No me opening my laptop.  
+A reel was generated, captioned, and posted to Instagram  
+while I was asleep.
+
+That feeling of seeing your automation run for the first time  
+is genuinely one of the best things about being a developer.  
+You build something once  
+and it just keeps going.
+
+Every day since, without fail —  
+a Bhagavad Gita quote, rendered in gold,  
+Sanskrit and Hindi and English,  
+background music fading in and out,  
+posted at 6:30 AM.
+
+I didn't touch anything.  
+The pipeline didn't care.  
+It just ran.
+
+---
+
+## Two Months Later
+
+The pipeline still runs every day.  
+6:30 AM, without fail.  
+60+ reels posted.  
+Zero manual effort.
+
+Also zero growth.
+
+No viral reel. No follower spike.  
+Most reels sitting quietly at single digit views,  
+unbothered, unvisited, at peace with themselves.
+
+Turns out posting daily grows your page  
+only if people actually want to watch what you're posting.  
+Automation can handle consistency.  
+It cannot handle content.
+
+I built a perfectly functioning machine  
+to consistently produce things nobody asked for.
+
+Would I do it again?  
+Absolutely.  
+I learned more building this than I would have  
+just posting manually for two months.  
+And honestly, the pipeline is kind of beautiful.
+
+It runs every morning whether anyone watches or not.  
+Like a monk doing his prayers.  
+Unbothered by results.
+
+Which, now that I think about it,  
+is very on brand for a Bhagavad Gita account.
+
+---
+
+## But I'm Not Stopping Here
+
+This project taught me something important.  
+Not just about Meta APIs or GitHub Actions or Python.  
+But about what's actually possible when you combine  
+developer thinking with AI as a co-builder.
+
+Gita Reels was the experiment.  
+Now I know what I'm doing.
+
+Next, I'm planning to take this further —  
+faceless YouTube channels, automated video reels,  
+content pipelines, SaaS products, full automations.  
+Things that run without me.  
+Things that scale without me.  
+Built fast, built smart, built with AI doing the heavy lifting  
+while I focus on the idea and the direction.
+
+The experience is there.  
+The lessons are there.  
+The tools are there.  
+What's next is just building.
+
+---
+
+## Check It Out
+
+If you're curious to see it running or want to build something similar:
+
+- [GitHub Repo — gita-reels](https://github.com/sanket7474/gita-reels)
+- [Instagram — @dailywisdomgita](https://www.instagram.com/dailywisdomgita?igsh=cW9kdzdya3Njajlk)
