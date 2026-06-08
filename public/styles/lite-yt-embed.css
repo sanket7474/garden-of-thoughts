@@ -6,8 +6,12 @@ lite-youtube {
   background-position: center center;
   background-size: cover;
   cursor: pointer;
-  max-width: 720px;
-  z-index: -999;
+  width: 100%;
+  max-width: 100%;
+  margin: 1.5rem 0;
+  z-index: 0;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 /* gradient */

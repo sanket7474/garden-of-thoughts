@@ -33,9 +33,10 @@ const {
 
 const { Content } = await render(note);
 
-const includeYTResources = note.body.includes('lite-youtube');
+const includeYTResources =
+  note.body.includes('<Youtube') || note.body.includes('lite-youtube');
 
-const permalink = "https://sanketmaske.dev/${slug}/";
+const permalink = `https://sanketmaske.dev/blog/${slug}/`;
 
 const titleEncoded = encodeURIComponent(`re: ${title}`);
 ---
