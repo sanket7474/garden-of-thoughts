@@ -11,33 +11,6 @@ const checkboxValues = {
 };
 
 let trailsScriptsInjected = false;
-let decorativeAnimationsPaused = false;
-
-function applyDecorativeAnimationsPause(paused) {
-  decorativeAnimationsPaused = paused;
-
-  const trailsEnabled =
-    window.localStorage.getItem(configurations.cursorTrails) === 'true';
-  const vinesEnabled =
-    window.localStorage.getItem(configurations.vines) === 'true';
-
-  window.setCursorTrailsEnabled?.(trailsEnabled && !paused);
-  window.setVineAnimation?.(vinesEnabled && !paused);
-}
-
-window.setDecorativeAnimationsPaused = applyDecorativeAnimationsPause;
-
-window.addEventListener('yt-playback-start', () => {
-  applyDecorativeAnimationsPause(true);
-});
-
-window.addEventListener('yt-playback-end', () => {
-  applyDecorativeAnimationsPause(false);
-});
-
-window.addEventListener('pagehide', () => {
-  applyDecorativeAnimationsPause(false);
-});
 
 function disableOption(option) {
   document.documentElement.classList.add('rainbows');
@@ -71,7 +44,7 @@ function enableOption(option) {
   window.localStorage.setItem(option, 'true');
 
   if (option === configurations.cursorTrails) {
-    window.setCursorTrailsEnabled?.(!decorativeAnimationsPaused);
+    window.setCursorTrailsEnabled?.(true);
   }
 
   if (option === configurations.cursorTrails && !trailsScriptsInjected) {
@@ -95,7 +68,7 @@ function enableOption(option) {
   }
 
   if (option === configurations.vines) {
-    window.setVineAnimation?.(!decorativeAnimationsPaused);
+    window.setVineAnimation?.(true);
     const canvas = document.querySelector('#vineCanvas');
     canvas?.classList.add('show');
   }

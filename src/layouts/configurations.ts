@@ -10,34 +10,6 @@ const checkboxValues = {
 };
 
 let trailsScriptsInjected = false;
-let decorativeAnimationsPaused = false;
-
-function applyDecorativeAnimationsPause(paused: boolean) {
-  decorativeAnimationsPaused = paused;
-
-  const trailsEnabled = window.localStorage.getItem(configurations.cursorTrails) === 'true';
-  const vinesEnabled = window.localStorage.getItem(configurations.vines) === 'true';
-
-  // @ts-ignore
-  window.setCursorTrailsEnabled?.(trailsEnabled && !paused);
-  // @ts-ignore
-  window.setVineAnimation?.(vinesEnabled && !paused);
-}
-
-// @ts-ignore
-window.setDecorativeAnimationsPaused = applyDecorativeAnimationsPause;
-
-window.addEventListener('yt-playback-start', () => {
-  applyDecorativeAnimationsPause(true);
-});
-
-window.addEventListener('yt-playback-end', () => {
-  applyDecorativeAnimationsPause(false);
-});
-
-window.addEventListener('pagehide', () => {
-  applyDecorativeAnimationsPause(false);
-});
 
 function disableOption(option:any) {
   document.documentElement.classList.add('rainbows');
@@ -48,7 +20,7 @@ function disableOption(option:any) {
 
   if (option === configurations.cursorTrails) {
     // @ts-ignore
-    window.setCursorTrailsEnabled?.(false && !decorativeAnimationsPaused);
+    window.setCursorTrailsEnabled?.(false);
   }
 
   if(option === configurations.vines) {
@@ -56,7 +28,7 @@ function disableOption(option:any) {
 
     canvas.classList.add("hide");
     // @ts-ignore
-    window.setVineAnimation?.(false && !decorativeAnimationsPaused);
+    window.setVineAnimation?.(false);
     
   }
 }
@@ -70,7 +42,7 @@ function enableOption(option:any) {
 
   if (option === configurations.cursorTrails) {
     // @ts-ignore
-    window.setCursorTrailsEnabled?.(!decorativeAnimationsPaused);
+    window.setCursorTrailsEnabled?.(true);
   }
 
   if (option === configurations.cursorTrails && !trailsScriptsInjected) {
@@ -95,7 +67,7 @@ function enableOption(option:any) {
 
   if(option === configurations.vines) {
     // @ts-ignore
-    window.setVineAnimation?.(!decorativeAnimationsPaused);
+    window.setVineAnimation?.(true);
     const canvas = document.querySelector("#vineCanvas");
     canvas.classList.add("show");
   }

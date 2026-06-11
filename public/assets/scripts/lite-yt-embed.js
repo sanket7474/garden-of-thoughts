@@ -30,6 +30,11 @@ class LiteYTEmbed extends HTMLElement {
 
     this.dataset.title = this.getAttribute('title') || '';
 
+    const titleAttr = this.getAttribute('title') || '';
+    if (!titleAttr || titleAttr.toLowerCase() === 'youtube video') {
+      this.hydrateVideoTitle();
+    }
+
     /**
      * Lo, the youtube poster image!  (aka the thumbnail, image placeholder, etc)
      *
@@ -73,6 +78,34 @@ class LiteYTEmbed extends HTMLElement {
     // so they don't autoplay automatically. Instead we must load an additional 2 sequential JS files (1KB + 165KB) (un-br) for the YT Player API
     // TODO: Try loading the the YT API in parallel with our iframe and then attaching/playing it. #82
     this.needsYTApi = this.hasAttribute('js-api');
+  }
+
+  async hydrateVideoTitle() {
+    if (!this.videoId) return;
+
+    try {
+      const res = await fetch(
+        `https://www.youtube.com/oembed?url=${encodeURIComponent(
+          `https://www.youtube.com/watch?v=${this.videoId}`,
+        )}&format=json`,
+      );
+      if (!res.ok) return;
+
+      const data = await res.json();
+      const videoTitle = data?.title?.trim();
+      if (!videoTitle) return;
+
+      this.dataset.title = videoTitle;
+      this.setAttribute('title', videoTitle);
+      this.playLabel = `Play ${videoTitle}`;
+
+      const hiddenLabel = this.querySelector('.lty-playbtn .lyt-visually-hidden');
+      if (hiddenLabel) {
+        hiddenLabel.textContent = this.playLabel;
+      }
+    } catch {
+      // ignore title lookup failures and keep fallback title
+    }
   }
 
   /**
@@ -195,13 +228,10 @@ class LiteYTEmbed extends HTMLElement {
 
     this.classList.add('lyt-activated');
 
-    window.dispatchEvent(new CustomEvent('yt-playback-start'));
-
     if (!this._resumeObserver) {
       this._resumeObserver = new IntersectionObserver((entries) => {
         const entry = entries[0];
         if (!entry || entry.isIntersecting) return;
-        window.dispatchEvent(new CustomEvent('yt-playback-end'));
         this._resumeObserver.disconnect();
         this._resumeObserver = null;
       }, { threshold: 0 });
