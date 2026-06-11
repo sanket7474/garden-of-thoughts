@@ -11,6 +11,13 @@
  *   https://github.com/vb/lazyframe
  */
 class LiteYTEmbed extends HTMLElement {
+  static isLikelyMobile() {
+    return (
+      window.matchMedia('(pointer: coarse)').matches ||
+      /Android|iPhone|iPad|iPod|Mobi/i.test(navigator.userAgent)
+    );
+  }
+
   connectedCallback() {
     this.videoId = this.getAttribute('videoid');
 
@@ -174,6 +181,18 @@ class LiteYTEmbed extends HTMLElement {
 
   async activate() {
     if (this.classList.contains('lyt-activated')) return;
+
+    // Mobile browsers often jank heavily when in-page YouTube iframes start decoding.
+    // On mobile we prefer native/fullscreen playback by opening YouTube directly.
+    const allowInlineOnMobile = this.getAttribute('mobile-inline') === 'true';
+    if (LiteYTEmbed.isLikelyMobile() && !allowInlineOnMobile) {
+      const watchUrl = `https://www.youtube.com/watch?v=${encodeURIComponent(
+        this.videoId,
+      )}`;
+      window.location.href = watchUrl;
+      return;
+    }
+
     this.classList.add('lyt-activated');
 
     window.dispatchEvent(new CustomEvent('yt-playback-start'));

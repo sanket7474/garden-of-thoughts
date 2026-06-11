@@ -1,9 +1,10 @@
 ---
-const { id, title = "YouTube video" } = Astro.props;
+const { id, title = "YouTube video", inlineOnMobile = false } = Astro.props;
 ---
 <lite-youtube
   videoid={id}
   title={title}
   playlabel={`Play ${title}`}
   params="rel=0"
+  mobile-inline={inlineOnMobile ? 'true' : 'false'}
 ></lite-youtube>
