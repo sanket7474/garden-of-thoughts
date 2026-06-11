@@ -34,7 +34,7 @@ const {
 const { Content } = await render(note);
 
 const includeYTResources =
-  note.body.includes('<Youtube') || note.body.includes('lite-youtube');
+  note.body?.includes('<Youtube') || note.body?.includes('lite-youtube');
 
 const permalink = `https://sanketmaske.dev/blog/${slug}/`;
 
@@ -167,14 +167,38 @@ const titleEncoded = encodeURIComponent(`re: ${title}`);
   });
 
   const slug = window.__slug || document.location.pathname.split('/blog/')[1]?.replace('/', '');
-  
-  // Increment on visit
-  fetch(`/api/post-view?slug=${slug}`, { method: 'POST' })
-    .then(r => r.json())
-    .then(data => {
-      const el = document.getElementById('view-count');
-      if (el) el.textContent = `👁️ ${data.views} view${data.views === 1 ? '' : 's'}`;
-    });
+
+  const updateViews = () => {
+    fetch(`/api/post-view?slug=${slug}`, { method: 'POST' })
+      .then(r => r.json())
+      .then(data => {
+        const el = document.getElementById('view-count');
+        if (el) el.textContent = `👁️ ${data.views} view${data.views === 1 ? '' : 's'}`;
+      })
+      .catch(() => {
+        const el = document.getElementById('view-count');
+        if (el) el.textContent = '👁️ views unavailable';
+      });
+  };
+
+  const runWhenIdle = () => {
+    if ('requestIdleCallback' in window) {
+      // @ts-ignore
+      requestIdleCallback(updateViews, { timeout: 2000 });
+    } else {
+      setTimeout(updateViews, 350);
+    }
+  };
+
+  if (document.visibilityState === 'visible') {
+    runWhenIdle();
+  } else {
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        runWhenIdle();
+      }
+    }, { once: true });
+  }
   
 </script>
 </html>

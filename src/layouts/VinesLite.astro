@@ -1,0 +1,65 @@
+<style>
+  #vineCanvas {
+    display: none;
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  @media (max-width: 700px) {
+    #vineCanvas {
+      display: none !important;
+    }
+  }
+</style>
+
+<canvas id="vineCanvas" aria-hidden="true"></canvas>
+
+<script>
+  let vinesLoaded = false;
+  let vinesLoading = false;
+
+  async function ensureVinesLoaded() {
+    if (vinesLoaded || vinesLoading) return;
+    vinesLoading = true;
+    try {
+      await new Promise((resolve, reject) => {
+        const existing = document.querySelector('script[data-vines-lite]');
+        if (existing) {
+          existing.addEventListener('load', () => resolve(true), { once: true });
+          existing.addEventListener(
+            'error',
+            () => reject(new Error('Failed to load vines-lite.js')),
+            { once: true },
+          );
+          return;
+        }
+
+        const script = document.createElement('script');
+        script.src = '/assets/scripts/vines-lite.js';
+        script.async = true;
+        script.dataset.vinesLite = '1';
+        script.onload = () => resolve(true);
+        script.onerror = () => reject(new Error('Failed to load vines-lite.js'));
+        document.head.appendChild(script);
+      });
+
+      vinesLoaded = true;
+    } finally {
+      vinesLoading = false;
+    }
+  }
+
+  // @ts-ignore
+  window.setVineAnimation = async function (enabled) {
+    if (enabled) {
+      await ensureVinesLoaded();
+    }
+
+    // @ts-ignore
+    window.__setVineAnimationInternal?.(enabled);
+  };
+</script>

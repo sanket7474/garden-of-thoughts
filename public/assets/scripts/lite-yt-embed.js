@@ -176,6 +176,19 @@ class LiteYTEmbed extends HTMLElement {
     if (this.classList.contains('lyt-activated')) return;
     this.classList.add('lyt-activated');
 
+    window.dispatchEvent(new CustomEvent('yt-playback-start'));
+
+    if (!this._resumeObserver) {
+      this._resumeObserver = new IntersectionObserver((entries) => {
+        const entry = entries[0];
+        if (!entry || entry.isIntersecting) return;
+        window.dispatchEvent(new CustomEvent('yt-playback-end'));
+        this._resumeObserver.disconnect();
+        this._resumeObserver = null;
+      }, { threshold: 0 });
+      this._resumeObserver.observe(this);
+    }
+
     if (this.needsYTApi) {
       return this.addYTPlayerIframe(this.getParams());
     }
@@ -187,6 +200,13 @@ class LiteYTEmbed extends HTMLElement {
     iframeEl.focus();
   }
 
+  disconnectedCallback() {
+    if (this._resumeObserver) {
+      this._resumeObserver.disconnect();
+      this._resumeObserver = null;
+    }
+  }
+
   createBasicIframe() {
     const iframeEl = document.createElement('iframe');
     iframeEl.width = 560;
@@ -196,6 +216,9 @@ class LiteYTEmbed extends HTMLElement {
     iframeEl.allow =
       'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture';
     iframeEl.allowFullscreen = true;
+    iframeEl.loading = 'eager';
+    iframeEl.referrerPolicy = 'strict-origin-when-cross-origin';
+    iframeEl.style.contain = 'layout style paint';
     // AFAIK, the encoding here isn't necessary for XSS, but we'll do it only because this is a URL
     // https://stackoverflow.com/q/64959723/89484
     iframeEl.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(

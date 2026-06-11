@@ -3,6 +3,7 @@ const configurations = {
   cursorTrails: 'cursor-trails',
   vines: 'vines',
 };
+
 const checkboxValues = {
   [configurations.darkMode]: false,
   [configurations.cursorTrails]: false,
@@ -12,19 +13,18 @@ const checkboxValues = {
 let trailsScriptsInjected = false;
 let decorativeAnimationsPaused = false;
 
-function applyDecorativeAnimationsPause(paused: boolean) {
+function applyDecorativeAnimationsPause(paused) {
   decorativeAnimationsPaused = paused;
 
-  const trailsEnabled = window.localStorage.getItem(configurations.cursorTrails) === 'true';
-  const vinesEnabled = window.localStorage.getItem(configurations.vines) === 'true';
+  const trailsEnabled =
+    window.localStorage.getItem(configurations.cursorTrails) === 'true';
+  const vinesEnabled =
+    window.localStorage.getItem(configurations.vines) === 'true';
 
-  // @ts-ignore
   window.setCursorTrailsEnabled?.(trailsEnabled && !paused);
-  // @ts-ignore
   window.setVineAnimation?.(vinesEnabled && !paused);
 }
 
-// @ts-ignore
 window.setDecorativeAnimationsPaused = applyDecorativeAnimationsPause;
 
 window.addEventListener('yt-playback-start', () => {
@@ -39,70 +39,71 @@ window.addEventListener('pagehide', () => {
   applyDecorativeAnimationsPause(false);
 });
 
-function disableOption(option:any) {
+function disableOption(option) {
   document.documentElement.classList.add('rainbows');
   document.documentElement.classList.remove(option);
-  if (option === configurations.darkMode)
+
+  if (option === configurations.darkMode) {
     document.documentElement.style.colorScheme = 'light';
+  }
+
   window.localStorage.setItem(option, 'false');
 
   if (option === configurations.cursorTrails) {
-    // @ts-ignore
-    window.setCursorTrailsEnabled?.(false && !decorativeAnimationsPaused);
+    window.setCursorTrailsEnabled?.(false);
   }
 
-  if(option === configurations.vines) {
-    const canvas = document.querySelector("#vineCanvas");
-
-    canvas.classList.add("hide");
-    // @ts-ignore
-    window.setVineAnimation?.(false && !decorativeAnimationsPaused);
-    
+  if (option === configurations.vines) {
+    const canvas = document.querySelector('#vineCanvas');
+    canvas?.classList.add('hide');
+    window.setVineAnimation?.(false);
   }
 }
-function enableOption(option:any) {
 
+function enableOption(option) {
   document.documentElement.classList.add('rainbows');
   document.documentElement.classList.add(option);
-  if (option === configurations.darkMode)
+
+  if (option === configurations.darkMode) {
     document.documentElement.style.colorScheme = 'dark';
+  }
+
   window.localStorage.setItem(option, 'true');
 
   if (option === configurations.cursorTrails) {
-    // @ts-ignore
     window.setCursorTrailsEnabled?.(!decorativeAnimationsPaused);
   }
 
   if (option === configurations.cursorTrails && !trailsScriptsInjected) {
-    // No trails on small screens or touch-first devices
     const isSmallScreen = document.documentElement.clientWidth < 640;
     const isTouchDevice =
       window.matchMedia('(pointer: coarse)').matches ||
       navigator.maxTouchPoints > 0;
-    if (isSmallScreen || isTouchDevice) return;
-    var pixiScript = document.createElement('script');
-    pixiScript.onload = function () {
-      const trailsScript = document.createElement('script');
-      trailsScript.src = '/assets/scripts/cursorTrails.js';
-      document.head.appendChild(trailsScript);
-      trailsScriptsInjected = true;
-    };
-    pixiScript.src =
-      'https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.3.1/pixi.min.js';
 
-    document.head.appendChild(pixiScript);
+    if (!isSmallScreen && !isTouchDevice) {
+      const pixiScript = document.createElement('script');
+      pixiScript.onload = function () {
+        const trailsScript = document.createElement('script');
+        trailsScript.src = '/assets/scripts/cursorTrails.js';
+        document.head.appendChild(trailsScript);
+        trailsScriptsInjected = true;
+      };
+      pixiScript.src =
+        'https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.3.1/pixi.min.js';
+      document.head.appendChild(pixiScript);
+    }
   }
 
-  if(option === configurations.vines) {
-    // @ts-ignore
+  if (option === configurations.vines) {
     window.setVineAnimation?.(!decorativeAnimationsPaused);
-    const canvas = document.querySelector("#vineCanvas");
-    canvas.classList.add("show");
+    const canvas = document.querySelector('#vineCanvas');
+    canvas?.classList.add('show');
   }
 }
 
 for (const option of Object.values(configurations)) {
   const localStorageValue = window.localStorage.getItem(option);
+
   if (localStorageValue === 'true') {
     enableOption(option);
     checkboxValues[option] = true;
@@ -110,7 +111,6 @@ for (const option of Object.values(configurations)) {
     disableOption(option);
     checkboxValues[option] = false;
   } else {
-    // defaults
     switch (option) {
       case configurations.darkMode:
         if (
@@ -118,12 +118,12 @@ for (const option of Object.values(configurations)) {
           window.matchMedia('(prefers-color-scheme: dark)').matches
         ) {
           enableOption(option);
+          checkboxValues[option] = true;
         } else {
           disableOption(option);
         }
         break;
       case configurations.cursorTrails:
-        // respect reduced motion
         if (
           window.matchMedia &&
           window.matchMedia('(prefers-reduced-motion: no-preference)').matches
@@ -134,44 +134,35 @@ for (const option of Object.values(configurations)) {
           disableOption(option);
         }
         break;
+      case configurations.vines:
+        disableOption(option);
+        break;
     }
   }
 }
 
-addEventListener('DOMContentLoaded', (event) => {
-
-  
+document.addEventListener('DOMContentLoaded', () => {
   for (const option of Object.values(configurations)) {
+    const checkbox = document.getElementById(option);
 
-    
-
-    const checkbox = document.getElementById(option) as HTMLInputElement;
-    
-    if(option === configurations.vines) {
-      
-      if(checkboxValues[option]) {
-        console.log('Enabling vines animation');
-        // @ts-ignore
+    if (option === configurations.vines) {
+      if (checkboxValues[option]) {
         window.setVineAnimation?.(true);
-      } else{
-        // @ts-ignore
+      } else {
         window.setVineAnimation?.(false);
       }
     }
+
     if (checkbox) {
       checkbox.addEventListener('click', () => {
-        
         if (checkbox.checked) {
           enableOption(option);
         } else {
           disableOption(option);
         }
       });
-    }
 
-    // Make sure the UI reflects the current state.
-    if (checkboxValues[option]) {
-      checkbox.checked = true;
+      checkbox.checked = Boolean(checkboxValues[option]);
     }
   }
 });

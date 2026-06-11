@@ -1,5 +1,18 @@
 <script>
-  const elem = document.createElement('script');
-  elem.src = '/assets/scripts/lite-yt-embed.js';
-  document.head.append(elem);
+  if (!customElements.get('lite-youtube') && !document.querySelector('script[data-lite-youtube]')) {
+    const loadLiteYT = () => {
+      const elem = document.createElement('script');
+      elem.src = '/assets/scripts/lite-yt-embed.js';
+      elem.async = true;
+      elem.dataset.liteYoutube = '1';
+      document.head.append(elem);
+    };
+
+    if ('requestIdleCallback' in window) {
+      // @ts-ignore
+      requestIdleCallback(loadLiteYT, { timeout: 1200 });
+    } else {
+      setTimeout(loadLiteYT, 0);
+    }
+  }
 </script>

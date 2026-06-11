@@ -76,13 +76,19 @@
     <canvas id="vineCanvas" aria-label="Animated growing vine"></canvas>
   </body>
   <script>
-    const canvas = document.querySelector("#vineCanvas");
+    const canvas = document.querySelector("#vineCanvas") as HTMLCanvasElement;
     const ctx = canvas.getContext("2d");
 
     const TAU = Math.PI * 2;
     const rand = mulberry32(42);
     const MIN_BRANCH_DURATION = 0.045;
     const MAX_BRANCH_DURATION = 0.16;
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const isLowPowerDevice =
+      ((navigator as any).deviceMemory && (navigator as any).deviceMemory <= 4) ||
+      (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4);
+    const frameIntervalMs = isLowPowerDevice ? 1000 / 30 : 1000 / 45;
+
     const vine = {
       points: [],
       leaves: [],
@@ -96,6 +102,9 @@
       age: 0,
       lastFrame: 0,
     };
+    let initialized = false;
+    let resizeRafId = 0;
+    let lastRenderTs = 0;
 
     function mulberry32(seed) {
       return function random() {
@@ -116,6 +125,21 @@
       buildVine();
     }
 
+    function initializeVineIfNeeded() {
+      if (initialized) return;
+      resize();
+      initialized = true;
+    }
+
+    function handleResize() {
+      if (!initialized) return;
+      if (resizeRafId) return;
+      resizeRafId = requestAnimationFrame(() => {
+        resizeRafId = 0;
+        resize();
+      });
+    }
+
     function buildVine() {
       vine.points = [];
       vine.leaves = [];
@@ -128,7 +152,8 @@
       const h = innerHeight;
       const w = innerWidth;
       const rightEdge = w - Math.max(18, Math.min(42, w * 0.045));
-      const segments = Math.max(96, Math.floor(h / 6));
+      const detailScale = isLowPowerDevice ? 0.72 : 1;
+      const segments = Math.max(64, Math.floor((h / 6) * detailScale));
 
       for (let i = 0; i <= segments; i++) {
         const t = i / segments;
@@ -140,7 +165,7 @@
         vine.points.push({ x, y, t });
       }
 
-      for (let i = 7; i < segments - 7; i += 3) {
+      for (let i = 7; i < segments - 7; i += isLowPowerDevice ? 4 : 3) {
         const t = i / segments;
         const p = vine.points[i];
         const side = rand() > 0.48 ? 1 : -1;
@@ -190,7 +215,7 @@
         }
       }
 
-      for (let i = 12; i < segments - 8; i += 7) {
+      for (let i = 12; i < segments - 8; i += isLowPowerDevice ? 9 : 7) {
         const t = i / segments;
         const side = rand() > 0.46 ? 1 : -1;
         const duration = Math.min(
@@ -249,7 +274,7 @@
         }
       }
 
-      for (let i = 18; i < segments - 16; i += 19) {
+      for (let i = 18; i < segments - 16; i += isLowPowerDevice ? 24 : 19) {
         vine.tendrils.push({
           index: i,
           t: i / segments,
@@ -260,7 +285,7 @@
         });
       }
 
-      for (let strand = 0; strand < 3; strand++) {
+      for (let strand = 0; strand < (isLowPowerDevice ? 2 : 3); strand++) {
         vine.tangles.push({
           offset: 10 + strand * 8 + rand() * 10,
           phase: rand() * TAU,
@@ -931,7 +956,21 @@
       ctx.restore();
     }
 
+    let isAnimating = false;
+    let rafId = 0;
+
     function draw(timeStamp) {
+      if (!isAnimating) {
+        rafId = 0;
+        return;
+      }
+
+      if (lastRenderTs && timeStamp - lastRenderTs < frameIntervalMs) {
+        rafId = requestAnimationFrame(draw);
+        return;
+      }
+      lastRenderTs = timeStamp;
+
       const time = timeStamp / 1000;
       const delta = vine.lastFrame
         ? Math.min(0.05, time - vine.lastFrame)
@@ -951,23 +990,47 @@
       vine.clusters.forEach((cluster) => drawCluster(cluster, time));
       vine.flowers.forEach((flower) => drawFlower(flower, time));
 
-      requestAnimationFrame(draw);
+      rafId = requestAnimationFrame(draw);
     }
 
-    window.addEventListener("resize", resize);
-    resize();
-    requestAnimationFrame(draw);
+    window.addEventListener("resize", handleResize);
+    // Do not start animation by default; it is toggled from configurations.ts.
 
+    // @ts-ignore
     window.setVineAnimation = function (enabled) {
 
-    const canvas = document.querySelector("#vineCanvas");
-    canvas.style.display = enabled ? "block" : "none";
+    const canvas = document.querySelector("#vineCanvas") as HTMLCanvasElement | null;
+    if (!canvas) return;
+    const mobile = window.matchMedia("(max-width: 700px)").matches;
+    const shouldEnable = Boolean(enabled) && !mobile && !prefersReducedMotion;
 
-    if (enabled) {
+    canvas.style.display = shouldEnable ? "block" : "none";
+    isAnimating = shouldEnable;
+
+    if (!shouldEnable) {
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = 0;
+      }
+      return;
+    }
+
+    initializeVineIfNeeded();
     vine.grow = 0;
     vine.lastFrame = 0;
-    requestAnimationFrame(draw);
+    lastRenderTs = 0;
+    if (!rafId) {
+      rafId = requestAnimationFrame(draw);
     }
 };
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        isAnimating = false;
+      } else if (canvas.style.display !== "none") {
+        isAnimating = true;
+        if (!rafId) rafId = requestAnimationFrame(draw);
+      }
+    });
   </script>
 </html>

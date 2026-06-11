@@ -61,7 +61,7 @@ const { page } = Astro.props;
 </div>
 
 <script>
-  const ENABLE_TRACKING = true;
+  const ENABLE_TRACKING = import.meta.env.PROD;
 
   function getDeviceId() {
     let id = localStorage.getItem("device-id");
@@ -102,7 +102,17 @@ const { page } = Astro.props;
 
   const path = window.location.pathname;
 
-  if (ENABLE_TRACKING) {
+  function isDoNotTrackEnabled() {
+    return (
+      navigator.doNotTrack === "1" ||
+      // @ts-ignore
+      window.doNotTrack === "1" ||
+      // @ts-ignore
+      navigator.msDoNotTrack === "1"
+    );
+  }
+
+  function sendPageHit() {
     const returning = localStorage.getItem("visited") === "true";
     localStorage.setItem("visited", "true");
 
@@ -115,8 +125,17 @@ const { page } = Astro.props;
         referrer: getReferrer(),
         userAgent: navigator.userAgent,
         returning,
-        deviceId: getDeviceId() 
+        deviceId: getDeviceId(),
       })
     );
+  }
+
+  if (ENABLE_TRACKING && !isDoNotTrackEnabled()) {
+    if ("requestIdleCallback" in window) {
+      // @ts-ignore
+      requestIdleCallback(sendPageHit, { timeout: 1500 });
+    } else {
+      setTimeout(sendPageHit, 300);
+    }
   }
 </script>

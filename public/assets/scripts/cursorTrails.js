@@ -5,9 +5,24 @@ let mouse = { x: 0, y: 0 },
   mouseV = { x: 0, y: 0 };
 let spritesheet,
   particles = [];
+let activeParticles = [];
+let rafId = 0;
+let isRunning = true;
 const colors = [
   0xe31104, 0xef5f1f, 0xc80e84, 0x48a71e, 0x1b81b4, 0x5741ac, 0x393f85,
 ];
+
+const isSmallScreen = () => document.documentElement.clientWidth < 640;
+const isTouchDevice =
+  window.matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0;
+const prefersReducedMotion =
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const PARTICLE_COUNT = prefersReducedMotion
+  ? 120
+  : isSmallScreen()
+    ? 180
+    : 420;
 
 function resize() {
   width = document.documentElement.clientWidth;
@@ -16,6 +31,8 @@ function resize() {
 }
 
 async function setup() {
+  if (isTouchDevice || prefersReducedMotion) return;
+
   resize();
 
   // set up Pixi stage and container
@@ -23,9 +40,12 @@ async function setup() {
     width,
     height,
     backgroundAlpha: 0,
+    antialias: false,
+    powerPreference: 'low-power',
+    resolution: 1,
   });
 
-  container = new PIXI.ParticleContainer(3000, {
+  container = new PIXI.ParticleContainer(PARTICLE_COUNT, {
     tint: true,
   });
 
@@ -56,7 +76,7 @@ async function setup() {
   );
 
   await spritesheet.parse();
-  for (let i = 0; i < 3000; i++) {
+  for (let i = 0; i < PARTICLE_COUNT; i++) {
     particles.push(new Particle(i));
   }
 }
@@ -86,6 +106,7 @@ class Particle {
     if (this.vy < -6) this.vy = -6;
     this.sprite.x = x;
     this.sprite.y = y;
+    this.active = true;
   }
 
   update() {
@@ -95,6 +116,9 @@ class Particle {
       this.sprite.y += this.vy;
       this.vx *= 0.9;
       this.vy *= 0.9;
+      if (this.sprite.alpha <= 0) {
+        this.active = false;
+      }
     }
   }
 }
@@ -105,14 +129,24 @@ window.addEventListener('mousemove', (e) => {
   mouse.y = e.clientY;
   spinning = false;
 });
-window.addEventListener('touchmove', (e) => {
-  mouse.x = e.touches[0].clientX;
-  mouse.y = e.touches[0].clientY;
-  spinning = false;
-});
+window.addEventListener(
+  'touchmove',
+  (e) => {
+    if (isTouchDevice || !e.touches?.length) return;
+    mouse.x = e.touches[0].clientX;
+    mouse.y = e.touches[0].clientY;
+  },
+  { passive: true },
+);
 
 function animate(t) {
+  if (!isRunning) {
+    rafId = 0;
+    return;
+  }
+
   if (window.localStorage.getItem('cursorTrails') === 'false') {
+    isRunning = false;
     return;
   }
   mouseV.x = lastMouse.x - mouse.x;
@@ -125,19 +159,60 @@ function animate(t) {
       const particle = particles[i];
       if (particle.sprite.alpha <= 0) {
         particle.launch(mouse, mouseV);
+        activeParticles.push(particle);
         break;
       }
     }
   }
 
-  for (let i = 0; i < particles.length; i++) {
-    particles[i].update();
+  for (let i = activeParticles.length - 1; i >= 0; i--) {
+    const particle = activeParticles[i];
+    particle.update();
+    if (!particle.active) {
+      activeParticles.splice(i, 1);
+    }
   }
 
-  requestAnimationFrame(animate);
+  rafId = requestAnimationFrame(animate);
 }
 
-requestAnimationFrame(animate);
+if (!isTouchDevice && !prefersReducedMotion) {
+  rafId = requestAnimationFrame(animate);
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    isRunning = false;
+    if (rafId) {
+      cancelAnimationFrame(rafId);
+      rafId = 0;
+    }
+    return;
+  }
+
+  if (
+    !isTouchDevice &&
+    !prefersReducedMotion &&
+    window.localStorage.getItem('cursorTrails') !== 'false'
+  ) {
+    isRunning = true;
+    if (!rafId) rafId = requestAnimationFrame(animate);
+  }
+});
+
+window.setCursorTrailsEnabled = (enabled) => {
+  if (enabled) {
+    if (isTouchDevice || prefersReducedMotion) return;
+    isRunning = true;
+    if (!rafId) rafId = requestAnimationFrame(animate);
+  } else {
+    isRunning = false;
+    if (rafId) {
+      cancelAnimationFrame(rafId);
+      rafId = 0;
+    }
+  }
+};
 
 function randomNormal() {
   let u = 0,
