@@ -1,0 +1,57 @@
+---
+const {
+  type = "info",
+  title,
+  design = "border"
+} = Astro.props;
+
+const labels = {
+  info: "Note",
+  tip: "Tip",
+  warning: "Warning",
+  danger: "Danger"
+};
+
+const icons = {
+  info: "ti-info-circle",
+  tip: "ti-bulb",
+  warning: "ti-alert-triangle",
+  danger: "ti-alert-octagon"
+};
+
+const label = title || labels[type] || labels.info;
+const icon = icons[type] || icons.info;
+---
+
+<div class={`callout callout--${design} callout--${type}`}>
+  {design === "dashed" ? (
+    <div class="callout__label callout__label--code">
+      <i class={`ti ${icon} callout__icon`} aria-hidden="true"></i>{`// ${label.toLowerCase()}`}
+    </div>
+  ) : (
+    <div class="callout__label">
+      <i class={`ti ${icon} callout__icon`} aria-hidden="true"></i>{label}
+    </div>
+  )}
+  <div class="callout__body">
+    <slot />
+  </div>
+</div>
+
+<!-- 
+Usage:
+
+<Callout type="warning" design="border">
+  The classic left-border style.
+</Callout>
+
+<Callout type="danger" design="dashed">
+  Terminal-style, dashed box with a code-comment label.
+</Callout>
+
+<Callout type="tip" design="quote" title="Pro tip">
+  Echoes your blockquote's bracket-style decoration.
+</Callout>
+
+
+-->

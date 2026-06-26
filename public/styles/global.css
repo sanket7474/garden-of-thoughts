@@ -493,3 +493,119 @@ hr {
 .hide {
   display: none;
 }
+
+
+/* ===== Callout: shared base ===== */
+.callout {
+  margin: 1.5em 0;
+  font-family: var(--font-mono);
+}
+
+.callout__body {
+  font-size: 1.1rem;
+  line-height: 1.5;
+}
+
+.callout__body :last-child {
+  margin-bottom: 0;
+}
+
+.callout__label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+/* ===== Design 1: left border ===== */
+.callout--border {
+  padding: 1rem 1.25rem;
+  border-left: 4px solid var(--accent-color);
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.dark-mode .callout--border {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* ===== Design 2: dashed box, terminal-style ===== */
+.callout--dashed {
+  padding: 1rem 1.25rem;
+  border: 1px dashed var(--accent-color);
+  background: transparent;
+}
+
+.callout__label--code {
+  text-transform: none;
+  letter-spacing: 0;
+  font-style: italic;
+}
+
+/* ===== Design 3: quote-style with corner marks ===== */
+.callout--quote {
+  padding: 1rem 1.5rem;
+  position: relative;
+}
+
+.callout--quote .callout__label,
+.callout--quote .callout__body {
+  padding-left: 1rem;
+}
+
+.callout--quote::before {
+  content: "[";
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-size: 2rem;
+  line-height: 1;
+  font-family: serif;
+  color: var(--accent-color);
+}
+
+.callout--quote::after {
+  content: "]";
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  font-size: 2rem;
+  line-height: 1;
+  font-family: serif;
+  color: var(--accent-color);
+}
+
+.callout__icon {
+  margin-right: 0.4rem;
+  font-size: 1rem;
+  vertical-align: -1px;
+}
+
+/* ===== Type colors (apply to all designs) ===== */
+.callout--info { --accent-color: var(--light-blue); }
+.callout--info .callout__label,
+.callout--info::before,
+.callout--info::after { color: var(--light-blue); }
+.callout--info.callout--border,
+.callout--info.callout--dashed { border-color: var(--light-blue); }
+
+.callout--tip { --accent-color: var(--green); }
+.callout--tip .callout__label,
+.callout--tip::before,
+.callout--tip::after { color: var(--green); }
+.callout--tip.callout--border,
+.callout--tip.callout--dashed { border-color: var(--green); }
+
+.callout--warning { --accent-color: var(--orange); }
+.callout--warning .callout__label,
+.callout--warning::before,
+.callout--warning::after { color: var(--orange); }
+.callout--warning.callout--border,
+.callout--warning.callout--dashed { border-color: var(--orange); }
+
+.callout--danger { --accent-color: var(--red); }
+.callout--danger .callout__label,
+.callout--danger::before,
+.callout--danger::after { color: var(--red); }
+.callout--danger.callout--border,
+.callout--danger.callout--dashed { border-color: var(--red); }
