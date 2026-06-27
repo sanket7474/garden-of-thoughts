@@ -1,0 +1,187 @@
+---
+title: "Bugs & Lessons #2 — Write Once, Run Anywhere (Unless It's RSA Padding)"
+date: 2026-06-27
+excerpt: Decrypting an SSO token worked manually, but failed in automation. The culprit? Two different Java 8 distributions silently disagreeing on math.
+slug: jvm-rsa-oaep-padding-mismatch
+tags: ['dev', 'bugs-and-lessons']
+draft: false
+minutesRead: 6
+---
+import Callout from '../../components/Callout.astro';
+
+Every developer has a growing collection of  
+"I had no idea that was even a thing" moments.  
+This series is about those real issues which you won't find in any tutorial, and the fix turns out to be something you'd never have Googled on your own.
+
+---
+
+## What's the issue?
+
+"Write once, run anywhere."  
+That's the promise Java made us.  
+Sometimes, it lies.
+
+We have an SSO flow built on RSA public-private keys. The sequence is straightforward:
+1. Send user ID and public key to an API.
+2. API returns a ciphertext (the user token).
+3. Decrypt the ciphertext locally using our private key.
+
+If we did this manually, it worked flawlessly.
+
+So we integrated this flow into our in-house API testing tool to simulate it automatically. We plugged a standard Java decryption method into our testing tool to handle the token.
+And it failed. Every single time.  
+We kept getting padding-related exceptions or silently corrupted garbage.
+
+<Callout type="warning" design="border" title="The wrong trail">
+We blamed the keys. The private key was stored in an Excel sheet for the automation class to read, so we spent hours convinced that invisible newline characters or whitespace were corrupting the Base64 string. We normalized, we trimmed, we decoded.
+
+Nothing worked. The keys were 100% identical.
+</Callout>
+
+---
+
+## What Was Actually Going On
+
+The issue wasn't our code.  
+It wasn't the Excel sheet either.
+
+It was the Java Virtual Machine itself.
+
+Our backend server was running on **IBM JDK 8**.  
+Our local automation environment was running on **Eclipse Temurin JDK 8**.
+
+On paper, both are Java 8.  
+Under the hood, their cryptographic providers —  
+`IBMJCE` versus `SunJCE` —  
+are completely different beasts.
+
+When you request a cipher transformation like  
+`RSA/ECB/OAEPWithSHA-256AndMGF1Padding`,  
+the algorithm actually needs two separate hashing mechanisms —  
+one for the OAEP digest,  
+one for the Mask Generation Function, MGF1.
+
+The standard string doesn't explicitly declare the MGF1 hash.  
+So each JVM quietly fills in the blank with its own default:
+
+- **IBM JDK (IBMJCE):** sets MGF1 hash to match the OAEP hash — **SHA-256**
+- **Eclipse Temurin (SunJCE):** hardcodes MGF1 default to **SHA-1**
+
+The server encrypted the token using SHA-256 for MGF1.  
+Our local automation tried to unpad it expecting SHA-1.
+
+<Callout type="warning" design="border" title="The actual root cause">
+One side expected SHA-1, the other gave SHA-256. The unpadding logic had no idea what to do with that. And Java threw a generic padding exception, without ever telling us why.
+</Callout>
+
+---
+
+## Why Does the JVM Even Do This?
+
+Fair question.  
+And the answer is:  
+the Java Cryptography Extension is a specification, not a strict implementation.
+
+Different vendors are allowed to write their own underlying security providers.  
+When an algorithm leaves room for implicit defaults,  
+each vendor fills that gap with whatever they think makes sense.
+
+IBM decided MGF1 should mirror the primary hash.  
+Sun, and later Oracle, decided it should stay pinned to legacy SHA-1.
+
+<Callout type="info" design="quote">
+Neither vendor is wrong. Both are technically compliant with the spec. But the moment your system spans multiple JVM vendors, these implicit defaults turn into invisible trapdoors — ones that only open in production, with real traffic, at the worst possible time.
+</Callout>
+
+---
+
+## The Fix
+
+We weren't finding this one alone.
+
+We searched Google, dug through Stack Overflow threads,  
+and eventually described the exact symptom to an LLM — IBM encrypting,  
+Temurin failing to decrypt with a generic padding exception.  
+It walked straight to the IBMJCE versus SunJCE distinction  
+before we'd even fully formed the theory ourselves.
+
+The fix is to stop letting the JVM make assumptions.  
+You explicitly pass an `OAEPParameterSpec`  
+that forces both environments to use the exact same parameters.
+
+```java
+private static AlgorithmParameterSpec getOAEPParameterSpec() {
+    String hashAlgo = "SHA-256";
+    return new OAEPParameterSpec(
+        hashAlgo,
+        "MGF1",
+        new MGF1ParameterSpec(hashAlgo),
+        PSource.PSpecified.DEFAULT
+    );
+}
+```
+
+And inject it directly into cipher initialization:
+
+```java
+Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding");
+AlgorithmParameterSpec oaepSpec = getOAEPParameterSpec();
+
+if (oaepSpec != null) {
+    cipher.init(Cipher.DECRYPT_MODE, privateKey, oaepSpec);
+} else {
+    cipher.init(Cipher.DECRYPT_MODE, privateKey);
+}
+```
+
+**Before the spec:** automation failing, endless key debugging, questioning our sanity.  
+**After the spec:** 100% consistent decryption across IBM JDK and Eclipse Temurin.
+
+---
+
+## But Here's The Uncomfortable Part
+
+The code we wrote initially wasn't `"wrong."`
+
+Run it OpenJDK-to-OpenJDK, it passes.  
+Run it IBM-to-IBM, it passes.
+
+It only breaks in the real world  
+where enterprise legacy infrastructure  
+collides with modern local development setups.
+
+You can write syntactically perfect code  
+and still lose days  
+to a vendor's opinion, written into a crypto library fifteen years ago,  
+that nobody on your team has ever read.
+
+---
+
+## What I Actually Learned
+
+**"Java 8" is a language version, not an execution guarantee.**  
+Two different JDK distributions can behave like entirely different operating systems at the security layer.
+
+<Callout type="tip" design="border" title="Pro tip">
+Never rely on `Cipher.getInstance()` defaults if the payload has to cross over to a different server or runtime. Explicitly define every digest, mask, and padding parameter.
+</Callout>
+
+**Don't fixate on your first hypothesis.**  
+We lost hours debugging Excel parsing and Base64 normalization  
+because "key issue" felt intuitive.  
+When inputs are verified identical,  
+stop looking at the data.  
+Start looking at the environment.
+
+**And sometimes, the fastest path to root cause isn't more debugging — it's a better question.**  
+Once we actually described the symptom precisely instead of guessing,  
+the answer came a lot faster than the manual digging ever would have.
+
+The explicit `OAEPParameterSpec` fixed our automation suite.  
+Learning never to trust cross-vendor JVM defaults is what stays in the toolbox.
+
+### References
+If you want to go deeper, these explain it better than I can:
+- [Oracle Docs — OAEPParameterSpec Class (Java SE 8)](https://docs.oracle.com/javase/8/docs/api/javax/crypto/spec/OAEPParameterSpec.html)
+- [IBM Documentation — Java Cryptography Extension (JCE) Overview](https://www.ibm.com/docs/en/sdk-java-technology/8?topic=guide-java-cryptography-extension-jce)
+- [GitHub — bcgit/bc-java Issue #1033: SunJCE OAEP/MGF1 default mismatch confirmed](https://github.com/bcgit/bc-java/issues/1033)
