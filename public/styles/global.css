@@ -609,3 +609,36 @@ hr {
 .callout--danger::after { color: var(--red); }
 .callout--danger.callout--border,
 .callout--danger.callout--dashed { border-color: var(--red); }
+
+
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-size: 0.95em;
+}
+
+th,
+td {
+  padding: 0.6rem 1rem;
+  border: 1px solid var(--border-color, #444);
+  text-align: left;
+}
+
+th {
+  background: var(--table-header-bg, rgba(255, 255, 255, 0.05));
+  font-weight: 600;
+}
+
+tr:nth-child(even) td {
+  background: var(--table-row-alt-bg, rgba(255, 255, 255, 0.02));
+}
+
+/* prevent overflow on mobile */
+.prose table,
+article table {
+  display: block;
+  overflow-x: auto;
+  white-space: nowrap;
+}
